@@ -27,6 +27,8 @@ public class Robot {
 
         chassis.update(desiredForward, desiredStrafe, desiredRotation,true, driveStation.isGyroReset);
 
+        chassis.log(telemetry);
+
         telemetry.update();
     }
 

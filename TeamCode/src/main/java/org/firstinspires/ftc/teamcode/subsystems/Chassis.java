@@ -6,6 +6,7 @@ import com.acmerobotics.roadrunner.Rotation2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 
 public class Chassis {
@@ -39,6 +40,12 @@ public class Chassis {
                         rotation
                 )
         );
+    }
+
+    public void log(Telemetry tele) {
+        tele.addData("Pinpoint X: ",drive.localizer.getPose().position.x);
+        tele.addData("Pinpoint Y: ",drive.localizer.getPose().position.y);
+        tele.addData("Pinpoint H: ",drive.localizer.getPose().heading.log());
     }
 
     public void setPose(){
