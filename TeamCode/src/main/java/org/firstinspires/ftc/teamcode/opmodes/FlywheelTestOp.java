@@ -22,10 +22,6 @@ public class FlywheelTestOp extends LinearOpMode {
         while (opModeIsActive()) {
             flywheel.update();
 
-            if(gamepad1.a) {
-                flywheel.set_Power(gamepad1.left_stick_y);
-            }
-
             flywheel.log(telemetry);
 
             telemetry.update();
