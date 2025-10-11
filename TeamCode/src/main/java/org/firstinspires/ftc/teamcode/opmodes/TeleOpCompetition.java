@@ -5,6 +5,7 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.subsystems.Limelight;
 import org.firstinspires.ftc.teamcode.subsystems.PoseStorage;
 import org.firstinspires.ftc.teamcode.subsystems.Robot;
 
@@ -16,10 +17,15 @@ public class TeleOpCompetition extends LinearOpMode {
 
         Robot robot = new Robot(hardwareMap, gamepad1, gamepad2, PoseStorage.poseStorage);
 
+        Limelight limelight = new Limelight(hardwareMap);
+
         waitForStart();
 
         while (opModeIsActive()) {
             robot.updateTeleOp(telemetry);
+
+            limelight.update();
+            limelight.log(telemetry);
         }
     }
 }
