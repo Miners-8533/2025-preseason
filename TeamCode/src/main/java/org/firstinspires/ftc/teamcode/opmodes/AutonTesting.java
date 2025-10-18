@@ -19,30 +19,37 @@ public class AutonTesting extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-        Pose2d initialPose = new Pose2d(-16,-62, Math.toRadians(90));
-        Pose2d scoreChamber = new Pose2d(-8,-28, Math.toRadians(90));
-        Pose2d intermediatePose = new Pose2d(-21, -37,Math.toRadians(120));
-        Pose2d scoreHighBasket = new Pose2d(-56, -51, Math.toRadians(225));
+        Pose2d initialPose = new Pose2d(64.5,-17.5, Math.toRadians(0));
+        Pose2d pickLoadingZone = new Pose2d(51.5,-61, Math.toRadians(0));
+        Pose2d secondScorePose = new Pose2d(57, -12,Math.toRadians(0));
+        /*Pose2d scoreHighBasket = new Pose2d(-56, -51, Math.toRadians(225));
         Pose2d firstSpikeMark = new Pose2d(-35.5, -22.5, Math.toRadians(180));
         Pose2d secondSpikeMark = new Pose2d(-44.5, -22.5, Math.toRadians(180));
         Pose2d thirdSpikeMark = new Pose2d(-52.5, -23, Math.toRadians(175));
-        Pose2d parkNearSubmersible = new Pose2d(-15, -6.5, Math.toRadians(0));
+        Pose2d parkNearSubmersible = new Pose2d(-15, -6.5, Math.toRadians(0));*/
 
         MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
 
         Robot robot = new Robot(hardwareMap,gamepad1,gamepad2, initialPose);
 
         TrajectoryActionBuilder tab1 = drive.actionBuilder(initialPose)
-                .splineToLinearHeading(scoreChamber, Math.toRadians(90),null, new ProfileAccelConstraint(-30,50));
+                .splineToLinearHeading(pickLoadingZone, Math.toRadians(0),null, new ProfileAccelConstraint(-30,50));
 
-        TrajectoryActionBuilder driveToIntermediate = drive.actionBuilder(scoreChamber)
+        TrajectoryActionBuilder tab2 = drive.actionBuilder(pickLoadingZone)
                 .setReversed(true)
-                .splineToLinearHeading(intermediatePose, Math.toRadians(180));
+                .splineToSplineHeading(secondScorePose, Math.toRadians(0));
+/*
+        TrajectoryActionBuilder tab1 = drive.actionBuilder(initialPose)
+                .splineToLinearHeading(pickLoadingZone, Math.toRadians(90),null, new ProfileAccelConstraint(-30,50));
 
-        TrajectoryActionBuilder tab2 = drive.actionBuilder(scoreChamber)
+        TrajectoryActionBuilder driveToIntermediate = drive.actionBuilder(pickLoadingZone)
+                .setReversed(true)
+                .splineToLinearHeading(secondScorePose, Math.toRadians(180));
+
+        TrajectoryActionBuilder tab2 = drive.actionBuilder(pickLoadingZone)
                 .setReversed(true)
                 .setTangent(Math.toRadians(270.0))
-                .splineToSplineHeading(intermediatePose, Math.toRadians(180))
+                .splineToSplineHeading(secondScorePose, Math.toRadians(180))
                 .splineToSplineHeading(firstSpikeMark, Math.toRadians(90),null, new ProfileAccelConstraint(-30,30));
 
         TrajectoryActionBuilder tab3  = drive.actionBuilder(firstSpikeMark)
@@ -62,11 +69,22 @@ public class AutonTesting extends LinearOpMode {
         TrajectoryActionBuilder tab7 = drive.actionBuilder(scoreHighBasket)
                 .setTangent(0)
                 .splineToLinearHeading(thirdSpikeMark,Math.toRadians(180),null, new ProfileAccelConstraint(-15,40));
-
+*/
         // Wait for the game to start (driver presses START)
         waitForStart();
 
-//        Actions.runBlocking(new ParallelAction(robot.autonUpdate(), new SequentialAction(
+        Actions.runBlocking(new ParallelAction(/*robot.autonUpdate(),*/ new SequentialAction(
+            /*new ParallelAction(
+                robot.autonStart(),
+                robot.scoreThree()
+            ),*/
+            new ParallelAction(
+                    tab1.build()/*,
+                    robot.acquire()*/
+            ),
+            tab2.build()/*,
+            robot.scoreThree()*/
+
 //                new ParallelAction(
 //                        robot.autonStart(),
 //                        tab1.build()
@@ -133,7 +151,7 @@ public class AutonTesting extends LinearOpMode {
 //                        tab6.build()
 //                ),
 //                robot.goToReadyPose()
-//        )));
+        )));
     }
 
 }
