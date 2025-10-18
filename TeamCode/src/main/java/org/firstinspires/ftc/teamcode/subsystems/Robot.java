@@ -25,7 +25,15 @@ public class Robot {
         desiredStrafe = driveStation.strafe;
         desiredRotation = driveStation.rotation;
 
-        chassis.update(desiredForward, desiredStrafe, desiredRotation,true, driveStation.isGyroReset);
+        chassis.update(
+                desiredForward,
+                desiredStrafe,
+                desiredRotation,
+                false,
+                driveStation.isGyroReset,
+                driveStation.isTargetOriented,
+                true
+        );
 
         chassis.log(telemetry);
 

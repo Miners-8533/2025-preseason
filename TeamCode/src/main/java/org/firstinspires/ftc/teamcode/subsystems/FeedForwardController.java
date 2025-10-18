@@ -39,4 +39,8 @@ public class FeedForwardController {
             return Math.min(Math.max(output, -1.0), 1.0);
         }
     }
+    void updateCoef(PIDFCoefficients coef, double kS) {
+        this.coefficients = coef;
+        kStiction = kS;
+    }
 }
