@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.ProfileAccelConstraint;
@@ -18,25 +20,24 @@ public class AutonTesting extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-
-        Pose2d initialPose = new Pose2d(64.5,-17.5, Math.toRadians(0));
-        Pose2d pickLoadingZone = new Pose2d(51.5,-61, Math.toRadians(0));
-        Pose2d secondScorePose = new Pose2d(57, -12,Math.toRadians(0));
+        Pose2d initialPose = new Pose2d(64.5,-17.5, Math.toRadians(180));
+        Pose2d pickLoadingZoneStart = new Pose2d(51.5,-61, Math.toRadians(-45));
+        Pose2d pickLoadingZoneEnd = new Pose2d(64.5,-61, Math.toRadians(0));
+        Pose2d secondScorePose = new Pose2d(57, -12,Math.toRadians(200));
         /*Pose2d scoreHighBasket = new Pose2d(-56, -51, Math.toRadians(225));
         Pose2d firstSpikeMark = new Pose2d(-35.5, -22.5, Math.toRadians(180));
         Pose2d secondSpikeMark = new Pose2d(-44.5, -22.5, Math.toRadians(180));
         Pose2d thirdSpikeMark = new Pose2d(-52.5, -23, Math.toRadians(175));
         Pose2d parkNearSubmersible = new Pose2d(-15, -6.5, Math.toRadians(0));*/
 
-        MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
-
         Robot robot = new Robot(hardwareMap,gamepad1,gamepad2, initialPose);
+        MecanumDrive drive = robot.getMecanumDrive();
 
         TrajectoryActionBuilder tab1 = drive.actionBuilder(initialPose)
-                .splineToLinearHeading(pickLoadingZone, Math.toRadians(0),null, new ProfileAccelConstraint(-30,50));
+                .splineToSplineHeading(pickLoadingZoneStart, Math.toRadians(0),null, new ProfileAccelConstraint(-5,5))
+                .splineToSplineHeading(pickLoadingZoneEnd, Math.toRadians(0), null, new ProfileAccelConstraint(-5,5));
 
-        TrajectoryActionBuilder tab2 = drive.actionBuilder(pickLoadingZone)
-                .setReversed(true)
+        TrajectoryActionBuilder tab2 = drive.actionBuilder(pickLoadingZoneEnd)
                 .splineToSplineHeading(secondScorePose, Math.toRadians(0));
 /*
         TrajectoryActionBuilder tab1 = drive.actionBuilder(initialPose)

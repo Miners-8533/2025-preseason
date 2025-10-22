@@ -30,7 +30,7 @@ public class Flywheel {
         fly_motor.setVelocityPIDFCoefficients(kP, 0.0, kD, kF);
         fly_motor.setVelocity(0.0);
 
-        fly_follow.setDirection(DcMotorSimple.Direction.FORWARD);
+        fly_follow.setDirection(DcMotorSimple.Direction.REVERSE);
         fly_follow.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         fly_follow.setMotorEnable();
         fly_follow.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);

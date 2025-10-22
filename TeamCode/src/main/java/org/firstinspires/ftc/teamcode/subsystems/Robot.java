@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.MecanumDrive;
 
 public class Robot {
     private Chassis chassis;
@@ -38,6 +39,9 @@ public class Robot {
         chassis.log(telemetry);
 
         telemetry.update();
+    }
+    public MecanumDrive getMecanumDrive() {
+        return chassis.getMecanumDrive();
     }
 
 }

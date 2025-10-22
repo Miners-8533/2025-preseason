@@ -96,5 +96,7 @@ public class Chassis {
         return new Vector2d(x * Math.cos(theta) + y * Math.sin(theta),
                 -x * Math.sin(theta) + y * Math.cos(theta));
     }
-
+    public MecanumDrive getMecanumDrive() {
+        return drive;
+    }
 }
