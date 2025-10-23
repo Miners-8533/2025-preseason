@@ -24,21 +24,29 @@ public class AutonTesting extends LinearOpMode {
         Pose2d pickLoadingZoneStart = new Pose2d(51.5,-61, Math.toRadians(-45));
         Pose2d pickLoadingZoneEnd = new Pose2d(64.5,-61, Math.toRadians(0));
         Pose2d secondScorePose = new Pose2d(57, -12,Math.toRadians(200));
-        /*Pose2d scoreHighBasket = new Pose2d(-56, -51, Math.toRadians(225));
-        Pose2d firstSpikeMark = new Pose2d(-35.5, -22.5, Math.toRadians(180));
-        Pose2d secondSpikeMark = new Pose2d(-44.5, -22.5, Math.toRadians(180));
-        Pose2d thirdSpikeMark = new Pose2d(-52.5, -23, Math.toRadians(175));
-        Pose2d parkNearSubmersible = new Pose2d(-15, -6.5, Math.toRadians(0));*/
+        Pose2d origin = new Pose2d(0, 0, Math.toRadians(0));
+        Pose2d test1 =  new Pose2d(50, 0, Math.toRadians(0));
+        Pose2d test2 =  new Pose2d(0, 50, Math.toRadians(0));
+//        Pose2d firstSpikeMark = new Pose2d(-35.5, -22.5, Math.toRadians(180));
+//        Pose2d secondSpikeMark = new Pose2d(-44.5, -22.5, Math.toRadians(180));
+//        Pose2d thirdSpikeMark = new Pose2d(-52.5, -23, Math.toRadians(175));
+//        Pose2d parkNearSubmersible = new Pose2d(-15, -6.5, Math.toRadians(0));
 
         Robot robot = new Robot(hardwareMap,gamepad1,gamepad2, initialPose);
         MecanumDrive drive = robot.getMecanumDrive();
 
         TrajectoryActionBuilder tab1 = drive.actionBuilder(initialPose)
-                .splineToSplineHeading(pickLoadingZoneStart, Math.toRadians(0),null, new ProfileAccelConstraint(-5,5))
-                .splineToSplineHeading(pickLoadingZoneEnd, Math.toRadians(0), null, new ProfileAccelConstraint(-5,5));
+                .splineToLinearHeading(pickLoadingZoneStart, Math.toRadians(90),null, new ProfileAccelConstraint(-5,5))
+                .splineToLinearHeading(pickLoadingZoneEnd, Math.toRadians(90), null, new ProfileAccelConstraint(-5,5));
 
         TrajectoryActionBuilder tab2 = drive.actionBuilder(pickLoadingZoneEnd)
-                .splineToSplineHeading(secondScorePose, Math.toRadians(0));
+                .setReversed(true)
+                .splineToLinearHeading(secondScorePose, Math.toRadians(90), null, new ProfileAccelConstraint(-5,5))
+                .splineToLinearHeading(origin, Math.toRadians(90), null, new ProfileAccelConstraint(-5,5));
+
+        TrajectoryActionBuilder tab3 = drive.actionBuilder(origin)
+                .splineToLinearHeading(test1, Math.toRadians(90), null, new ProfileAccelConstraint(-5,5))
+                .splineToLinearHeading(test2, Math.toRadians(90), null, new ProfileAccelConstraint(-5,5));
 /*
         TrajectoryActionBuilder tab1 = drive.actionBuilder(initialPose)
                 .splineToLinearHeading(pickLoadingZone, Math.toRadians(90),null, new ProfileAccelConstraint(-30,50));
@@ -83,7 +91,9 @@ public class AutonTesting extends LinearOpMode {
                     tab1.build()/*,
                     robot.acquire()*/
             ),
-            tab2.build()/*,
+            tab2.build(),
+            tab3.build()
+                /*,
             robot.scoreThree()*/
 
 //                new ParallelAction(
