@@ -57,7 +57,8 @@ public class Chassis {
         } else {
             targetPos = robotPose.minus(BLUE_TARGET);
         }
-        headingController.targetValue = (int) (Math.atan2(targetPos.y, targetPos.x) * 1000);
+        double targetHeading = Math.atan2(targetPos.y, targetPos.x) * 1000;
+        headingController.targetValue = (int) (targetHeading-Math.PI);
         if(isTargetOrientedControl) {
             rotation = headingController.update((int) (heading * 1000));
             headingController.updateCoef(new PIDFCoefficients(kP, kI, kD, 0.0),kS);
@@ -83,8 +84,8 @@ public class Chassis {
     public void log(Telemetry tele) {
         tele.addData("Pinpoint X: ",drive.localizer.getPose().position.x);
         tele.addData("Pinpoint Y: ",drive.localizer.getPose().position.y);
-        tele.addData("Pinpoint H: ",drive.localizer.getPose().heading.log());
-        tele.addData("Target heading: ", headingController.targetValue);
+        tele.addData("Pinpoint H: ",Math.toDegrees(drive.localizer.getPose().heading.toDouble()));
+        tele.addData("Target heading: ", Math.toDegrees(headingController.targetValue));
         tele.addData("Heading effort: ", commandedHeaading);
     }
 
