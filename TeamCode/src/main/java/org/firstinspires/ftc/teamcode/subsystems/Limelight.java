@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.LLFieldMap;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
@@ -14,7 +15,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 public class Limelight {
     private Limelight3A limelight;
 
-    private IMU imu;
+    private GoBildaPinpointDriver imu;
 
     private LLResult result;
     private Pose3D botpose;
@@ -25,15 +26,14 @@ public class Limelight {
         limelight.pipelineSwitch(0); // Resets the pipeline to 0 in case it was last on something else
         limelight.start();
 
-        imu = hardwareMap.get(IMU.class, "imu");
+        imu = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
     }
 
     public void update() {
-        YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
-        limelight.updateRobotOrientation(orientation.getYaw(AngleUnit.DEGREES));
+        limelight.updateRobotOrientation(imu.getHeading(AngleUnit.DEGREES));
         result = limelight.getLatestResult();
         if (result != null && result.isValid()) {
-            botpose = result.getBotpose_MT2();
+            botpose = result.getBotpose();
         }
 
     }
