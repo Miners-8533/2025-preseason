@@ -3,26 +3,29 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorImplEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
 @Config
-public class Flywheel {
-    //private MotorWithEncoderAndVelocityController fly_motor;
+public class Launcher {
     private DcMotorEx fly_motor;
     private DcMotorEx fly_follow;
     public static double targetVelocity = 0.0;
     public static double kP = 10.0;
     public static double kD = 5.0;
     public static double kF = 12.0;
-    public Flywheel(HardwareMap hardwareMap) {
+    private Servo hood;
+    public static double hoodTarget = 0.0;
+
+
+    public Launcher(HardwareMap hardwareMap) {
         fly_motor = hardwareMap.get(DcMotorEx.class, "fly_motor_enc");
         fly_follow = hardwareMap.get(DcMotorEx.class, "fly_follow");
+        hood = hardwareMap.get(Servo.class, "hood");
 
         fly_motor.setDirection(DcMotorSimple.Direction.FORWARD);
         fly_motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -42,6 +45,7 @@ public class Flywheel {
         fly_motor.setVelocity(targetVelocity);
 
         fly_follow.setPower(fly_motor.getPower());
+        hood.setPosition(hoodTarget);
     }
 
     public void log(Telemetry tele) {
