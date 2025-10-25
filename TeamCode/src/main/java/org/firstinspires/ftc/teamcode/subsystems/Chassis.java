@@ -57,8 +57,11 @@ public class Chassis {
         } else {
             targetPos = robotPose.minus(BLUE_TARGET);
         }
-        double targetHeading = Math.atan2(targetPos.y, targetPos.x) * 1000;
-        headingController.targetValue = (int) (targetHeading-Math.PI);
+        double targetHeading = (Math.atan2(targetPos.y, targetPos.x) + Math.PI);
+        if(targetHeading > Math.PI) {
+            targetHeading = targetHeading - (2*Math.PI);
+        }
+        headingController.targetValue = (int) (targetHeading*1000.0);
         if(isTargetOrientedControl) {
             rotation = headingController.update((int) (heading * 1000));
             headingController.updateCoef(new PIDFCoefficients(kP, kI, kD, 0.0),kS);

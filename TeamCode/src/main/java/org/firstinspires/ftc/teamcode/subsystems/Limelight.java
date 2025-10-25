@@ -14,12 +14,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
 public class Limelight {
     private Limelight3A limelight;
-
     private GoBildaPinpointDriver imu;
-
     private LLResult result;
     private Pose3D botpose;
-
     public Limelight(HardwareMap hardwareMap) {
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         limelight.setPollRateHz(100); // Asks the LL for data 100 times / second
@@ -33,7 +30,7 @@ public class Limelight {
         limelight.updateRobotOrientation(imu.getHeading(AngleUnit.DEGREES));
         result = limelight.getLatestResult();
         if (result != null && result.isValid()) {
-            botpose = result.getBotpose();
+            botpose = result.getBotpose_MT2();
         }
 
     }

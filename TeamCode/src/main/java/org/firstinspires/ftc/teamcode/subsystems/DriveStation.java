@@ -13,6 +13,7 @@ public class DriveStation {
     public boolean lastAcquire;
     public boolean isGyroReset;
     public boolean isTargetOriented;
+    public boolean isRedAlliance;
     public ElapsedTime acquireTimer;
     public DriveStation(Gamepad driverController, Gamepad operatorController) {
         driver = driverController;
@@ -30,6 +31,10 @@ public class DriveStation {
 
         if(driver.yWasPressed()) {
             isTargetOriented = !isTargetOriented;
+        }
+
+        if(driver.xWasPressed()) {
+            isRedAlliance = !isRedAlliance;
         }
 
 //        //driver score

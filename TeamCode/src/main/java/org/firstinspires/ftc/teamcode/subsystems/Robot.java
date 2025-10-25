@@ -33,7 +33,7 @@ public class Robot {
                 false,
                 driveStation.isGyroReset,
                 driveStation.isTargetOriented,
-                true
+                driveStation.isRedAlliance
         );
 
         chassis.log(telemetry);
