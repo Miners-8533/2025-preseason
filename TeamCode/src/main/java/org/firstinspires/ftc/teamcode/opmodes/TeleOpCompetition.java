@@ -17,15 +17,10 @@ public class TeleOpCompetition extends LinearOpMode {
 
         Robot robot = new Robot(hardwareMap, gamepad1, gamepad2, PoseStorage.poseStorage);
 
-        Limelight limelight = new Limelight(hardwareMap);
-
         waitForStart();
 
         while (opModeIsActive()) {
             robot.updateTeleOp(telemetry);
-
-            limelight.update();
-            limelight.log(telemetry);
         }
     }
 }
