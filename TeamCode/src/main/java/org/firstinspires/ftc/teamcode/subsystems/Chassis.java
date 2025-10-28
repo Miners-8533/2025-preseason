@@ -46,7 +46,7 @@ public class Chassis {
         }
         heading = heading - gyroOffset;
 
-        Vector2d BLUE_TARGET = new Vector2d(-64,-64);
+        Vector2d BLUE_TARGET = new Vector2d(-64,-60);
         Vector2d RED_TARGET = new Vector2d(-64,64);
 
         //Controller for target heading lock

@@ -11,12 +11,12 @@ public class Robot {
     private Chassis chassis;
     private Launcher launcher;
     private DriveStation driveStation;
-    private Limelight limelight;
+    //private Limelight limelight;
     public Robot(HardwareMap hardwareMap, Gamepad driverController, Gamepad operatorController, Pose2d initialPose) {
         chassis = new Chassis(hardwareMap, initialPose);
         driveStation = new DriveStation(driverController, operatorController);
         launcher = new Launcher(hardwareMap);
-        limelight = new Limelight(hardwareMap);
+        //limelight = new Limelight(hardwareMap);
     }
     public void updateTeleOp(Telemetry telemetry) {
         double desiredStrafe;
@@ -43,11 +43,11 @@ public class Robot {
         //distance get and send to launcher
 
         launcher.update();
-        limelight.update();
+        //limelight.update();
 
         chassis.log(telemetry);
         launcher.log(telemetry);
-        limelight.log(telemetry);
+        //limelight.log(telemetry);
 
         telemetry.update();
     }
