@@ -41,6 +41,7 @@ public class DriveStation {
             isRedAlliance = !isRedAlliance;
         }
 
+        //Basic intaking control
         if(driver.bWasPressed()) {
             isIntaking = !isIntaking;
         }
@@ -52,10 +53,10 @@ public class DriveStation {
             transport = 0.0;
         }
 
+        //Basic launching control for now
         if(driver.right_bumper) {
             transport = 1.0;
         }
-
         isStopRelease = driver.right_bumper;
 
 //        //driver score

@@ -69,7 +69,7 @@ public class Chassis {
         }
 
         if (isFieldOrientedControl) {
-            heading = heading - Math.PI/2;//TODO need to change depending on
+            heading = heading - Math.PI/2;//TODO need to change depending on alliance
             heading %= Math.PI; //Map onto (-PI,PI) range
             commanded_translation = rotate(forward, strafe, heading);
         } else {

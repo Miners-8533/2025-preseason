@@ -27,6 +27,7 @@ public class Launcher {
     public static double kD_I = 0.0;
     public static double kF_I = 0.0;
     private FeedForwardController currentFollower;
+    private FeedForwardController velocityPID;
     private final double[][] launchMap = {
             //Distance (in) , effort (ticks/second), angle (servo position [0,1.0]
             {0.0, 0.0, 0.0},//first point needs min values
@@ -42,7 +43,7 @@ public class Launcher {
         fly_motor.setDirection(DcMotorSimple.Direction.FORWARD);
         fly_motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         fly_motor.setMotorEnable();
-        fly_motor.setVelocityPIDFCoefficients(kP, 0.0, kD, kF);
+        fly_follow.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         fly_motor.setVelocity(0.0);
 
         fly_follow.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -53,6 +54,9 @@ public class Launcher {
 
         currentFollower = new FeedForwardController(new PIDCoefficients(kP_I, 0.0, kD_I));
         currentFollower.feedForwardFunc = (input)->{return kF_I*input;};
+
+        velocityPID = new FeedForwardController(new PIDCoefficients(kP,0.0,kD));
+        velocityPID.feedForwardFunc = (input)->{return kF*input;};
     }
 
     public void setDistance(double distance) {
@@ -81,19 +85,21 @@ public class Launcher {
             hoodTarget = launchMap[i][2];
         }
     }
-    public void setOff() {
-        targetVelocity = 0.0;
-    }
 
     public void update() {
-        fly_motor.setVelocityPIDFCoefficients(kP, 0.0, kD, kF);
+        velocityPID.coefficients = new PIDCoefficients(kP, 0.0, kD); //TODO for config REMOVE
+        velocityPID.feedForwardFunc = (input)->{return kF*input;}; //TODO for config REMOVE
         currentFollower.coefficients = new PIDCoefficients(kP_I, 0.0, kD_I); //TODO for config REMOVE
         currentFollower.feedForwardFunc = (input)->{return kF_I*input;}; //TODO for config REMOVE
-        fly_motor.setVelocity(targetVelocity);
+
+        velocityPID.targetValue = targetVelocity;
+        double newFlyMotorPower = velocityPID.update(fly_motor.getVelocity());
+        fly_motor.setPower(newFlyMotorPower);
 
         currentFollower.targetValue = fly_motor.getCurrent(CurrentUnit.MILLIAMPS);
         double newFollowPower = currentFollower.update(fly_follow.getCurrent(CurrentUnit.MILLIAMPS));
         fly_follow.setPower(newFollowPower);
+
         hood.setPosition(hoodTarget);
         stop.setPosition(stopTarget);
     }
