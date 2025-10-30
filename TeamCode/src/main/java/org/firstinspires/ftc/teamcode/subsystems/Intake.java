@@ -11,25 +11,27 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 public class Intake {
     private DcMotorEx intake;
     private DcMotorEx transport;//needs encoder connected
+    public double intakePower = SubSystemConfigs.INTAKE_STOP;
+    public double transportPower = SubSystemConfigs.TRANSPORT_STOP;
 
     public Intake(HardwareMap hardwareMap) {
         intake = hardwareMap.get(DcMotorEx.class, "intake");
         transport = hardwareMap.get(DcMotorEx.class, "transport");
 
-        intake.setDirection(DcMotorSimple.Direction.FORWARD);
+        intake.setDirection(DcMotorSimple.Direction.REVERSE);
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         intake.setPower(0.0);
         intake.setMotorEnable();
 
-        transport.setDirection(DcMotorSimple.Direction.FORWARD);
+        transport.setDirection(DcMotorSimple.Direction.REVERSE);
         transport.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         transport.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         transport.setPower(0.0);
         transport.setMotorEnable();
     }
 
-    public void update(double intakePower, double transportPower) {
+    public void update() {
         intake.setPower(intakePower);
         transport.setPower(transportPower);
     }

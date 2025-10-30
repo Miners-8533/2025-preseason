@@ -12,11 +12,13 @@ public class Robot {
     private Launcher launcher;
     private DriveStation driveStation;
     //private Limelight limelight;
+    private Intake intake;
     public Robot(HardwareMap hardwareMap, Gamepad driverController, Gamepad operatorController, Pose2d initialPose) {
         chassis = new Chassis(hardwareMap, initialPose);
         driveStation = new DriveStation(driverController, operatorController);
         launcher = new Launcher(hardwareMap);
         //limelight = new Limelight(hardwareMap);
+        intake = new Intake(hardwareMap);
     }
     public void updateTeleOp(Telemetry telemetry) {
         double desiredStrafe;
@@ -41,13 +43,22 @@ public class Robot {
         );
 
         //distance get and send to launcher
+        if(driveStation.isStopRelease) {
+            launcher.stopTarget = SubSystemConfigs.STOP_OPEN;
+        } else {
+            launcher.stopTarget = SubSystemConfigs.STOP_LOCK;
+        }
+        intake.intakePower = driveStation.intake;
+        intake.transportPower = driveStation.transport;
 
         launcher.update();
         //limelight.update();
+        intake.update();
 
         chassis.log(telemetry);
         launcher.log(telemetry);
         //limelight.log(telemetry);
+        intake.log(telemetry);
 
         telemetry.update();
     }

@@ -4,7 +4,7 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+import com.qualcomm.robotcore.hardware.PIDCoefficients;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -40,19 +40,10 @@ public class MotorWithEncoderAndVelocityController {
     public void setTarget(int targetVelocity) {
         ffc.targetValue = targetVelocity;
     }
-    public boolean isDone() {
-        int error = ((int) motor.getVelocity()) - ffc.targetValue;
-        boolean temp = Math.abs(error) < tolerance;
-//        if (temp){
-//            motor.setPower(-ffc.coefficients.f);
-//        }
-        return temp;
-    }
     public void log(Telemetry tele) {
         tele.addData(name + " current encoder ticks",   motor.getCurrentPosition());
         tele.addData(name + " motor current (A)",       motor.getCurrent(CurrentUnit.AMPS));
         tele.addData(name + " current target position", ffc.targetValue);
-        tele.addData(name + " atTarget?",               isDone());
         tele.addData(name + " motor power (+/-%FS)",    motor.getPower());
     }
 
@@ -63,13 +54,13 @@ public class MotorWithEncoderAndVelocityController {
     }
     public static class Config {
         public String deviceName;
-        public PIDFCoefficients coefficients;
+        public PIDCoefficients coefficients;
         public double kStiction;
         public DcMotorSimple.Direction direction;
         public boolean isFlipped;
         public int tolerance;
         public Config(String deviceName,
-                      PIDFCoefficients coefficients,
+                      PIDCoefficients coefficients,
                       double kStiction,
                       DcMotorSimple.Direction direction, int tolerance, boolean isFlipped) {
             this.deviceName = deviceName;

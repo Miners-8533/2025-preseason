@@ -1,20 +1,24 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.qualcomm.robotcore.hardware.PIDCoefficients;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import java.util.function.Function;
 
 public class FeedForwardController {
     private ElapsedTime timer = new ElapsedTime();
     private double lastError = Double.NaN;
     private double lastTime = Double.NaN;
     private double errorSum = 0.0;
-    public PIDFCoefficients coefficients;
+    public PIDCoefficients coefficients;
     public double kStiction = 0.0;
-    public int targetValue = 0;
-    public FeedForwardController(PIDFCoefficients coefficients) {
+    public double targetValue = 0;
+    public Function<Double, Double> feedForwardFunc = (a)->{return 0.0;};
+    public FeedForwardController(PIDCoefficients coefficients) {
         this.coefficients = coefficients;
     }
-    public double update(int measuredValue) {
+    public double update(double measuredValue) {
         double currentTime = timer.nanoseconds();
         double error = targetValue - measuredValue;
         if(lastTime == Double.NaN) {
@@ -32,15 +36,11 @@ public class FeedForwardController {
             double output = error * coefficients.p +
                     errorSum +
                     errorDeriv * coefficients.d;
-            if (targetValue != 0) {
-                output += coefficients.f;
-            }
+
+            output += feedForwardFunc.apply(targetValue);
+
             output = (Math.abs(output) < 0.01) ? (0.0) : (output + Math.signum(output) * kStiction);
             return Math.min(Math.max(output, -1.0), 1.0);
         }
-    }
-    void updateCoef(PIDFCoefficients coef, double kS) {
-        this.coefficients = coef;
-        kStiction = kS;
     }
 }

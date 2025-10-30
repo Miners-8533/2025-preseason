@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.PIDCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -19,20 +20,24 @@ public class Launcher {
     public static double kD = 5.0;
     public static double kF = 25.0;
     private Servo hood;
-    //private Servo stop;
-    public static double hoodTarget = 0.55;
-    //public static double stopTarget = 0.0;
-
+    private Servo stop;
+    public static double hoodTarget = SubSystemConfigs.HOOD_MAX;
+    public static double stopTarget = SubSystemConfigs.STOP_LOCK;
+    public static double kP_I = 0.0;
+    public static double kD_I = 0.0;
+    public static double kF_I = 0.0;
+    private FeedForwardController currentFollower;
     private final double[][] launchMap = {
             //Distance (in) , effort (ticks/second), angle (servo position [0,1.0]
             {0.0, 0.0, 0.0},//first point needs min values
             {0.0, 0.0, 0.0},
-            {0.0, 0.0, 0.0}//last point needs max values
+            {0.0, 740.0, 0.57}//last point needs max values
     };
     public Launcher(HardwareMap hardwareMap) {
         fly_motor = hardwareMap.get(DcMotorEx.class, "fly_motor_enc");
         fly_follow = hardwareMap.get(DcMotorEx.class, "fly_follow");
         hood = hardwareMap.get(Servo.class, "hood");
+        stop = hardwareMap.get(Servo.class, "stop");
 
         fly_motor.setDirection(DcMotorSimple.Direction.FORWARD);
         fly_motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -45,6 +50,9 @@ public class Launcher {
         fly_follow.setMotorEnable();
         fly_follow.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         fly_follow.setPower(0.0);
+
+        currentFollower = new FeedForwardController(new PIDCoefficients(kP_I, 0.0, kD_I));
+        currentFollower.feedForwardFunc = (input)->{return kF_I*input;};
     }
 
     public void setDistance(double distance) {
@@ -79,16 +87,20 @@ public class Launcher {
 
     public void update() {
         fly_motor.setVelocityPIDFCoefficients(kP, 0.0, kD, kF);
+        currentFollower.coefficients = new PIDCoefficients(kP_I, 0.0, kD_I); //TODO for config REMOVE
+        currentFollower.feedForwardFunc = (input)->{return kF_I*input;}; //TODO for config REMOVE
         fly_motor.setVelocity(targetVelocity);
 
-        fly_follow.setPower(fly_motor.getPower()*1.1);
+        currentFollower.targetValue = fly_motor.getCurrent(CurrentUnit.MILLIAMPS);
+        double newFollowPower = currentFollower.update(fly_follow.getCurrent(CurrentUnit.MILLIAMPS));
+        fly_follow.setPower(newFollowPower);
         hood.setPosition(hoodTarget);
-        //stop.setPosition(stopTarget);
+        stop.setPosition(stopTarget);
     }
     public void log(Telemetry tele) {
         tele.addData("Fly motor encoder ticks per second",  fly_motor.getVelocity());
-        tele.addData("Fly motor current (A)",               fly_motor.getCurrent(CurrentUnit.AMPS));
-        tele.addData("Follow motor current (A)",            fly_follow.getCurrent(CurrentUnit.AMPS));
+        tele.addData("Fly motor current (mA)",               fly_motor.getCurrent(CurrentUnit.MILLIAMPS));
+        tele.addData("Follow motor current (mA)",            fly_follow.getCurrent(CurrentUnit.MILLIAMPS));
         tele.addData("Fly motor power (+/-%FS)",            fly_motor.getPower());
         tele.addData("Follow motor power (+/-%FS)",         fly_follow.getPower());
     }

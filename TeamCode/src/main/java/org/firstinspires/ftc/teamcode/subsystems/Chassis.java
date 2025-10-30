@@ -6,6 +6,7 @@ import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Rotation2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.PIDCoefficients;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -26,7 +27,8 @@ public class Chassis {
     public Chassis(HardwareMap hardwareMap, Pose2d initialPose) {
         drive = new MecanumDrive(hardwareMap, initialPose);
         gyroOffset = 0;
-        headingController = new FeedForwardController(new PIDFCoefficients(kP, kI, kD, 0.0));
+        headingController = new FeedForwardController(new PIDCoefficients(kP, kI, kD));
+        headingController.kStiction = kS;
     }
 
     public void update(
@@ -58,16 +60,17 @@ public class Chassis {
             targetPos = robotPose.minus(BLUE_TARGET);
         }
         double targetHeading = (Math.atan2(targetPos.y, targetPos.x) + Math.PI);
-        if(targetHeading > Math.PI) {
-            targetHeading = targetHeading - (2*Math.PI);
-        }
-        headingController.targetValue = (int) (targetHeading*1000.0);
+        targetHeading %= Math.PI; //Map onto (-PI,PI) range
+        headingController.targetValue = targetHeading;
         if(isTargetOrientedControl) {
-            rotation = headingController.update((int) (heading * 1000));
-            headingController.updateCoef(new PIDFCoefficients(kP, kI, kD, 0.0),kS);
+            rotation = headingController.update(heading);
+            headingController.coefficients = new PIDCoefficients(kP, kI, kD);//TODO for config REMOVE
+            headingController.kStiction = kS; //TODO for config REMOVE
         }
 
         if (isFieldOrientedControl) {
+            heading = heading - Math.PI/2;//TODO need to change depending on
+            heading %= Math.PI; //Map onto (-PI,PI) range
             commanded_translation = rotate(forward, strafe, heading);
         } else {
             commanded_translation = new Vector2d(forward, strafe);
