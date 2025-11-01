@@ -14,15 +14,15 @@ public class DriveStation {
     public boolean isGyroReset;
     public boolean isTargetOriented;
     public boolean isRedAlliance;
-    public double intake;
-    public double transport;
     public boolean isStopRelease = false;
-    private boolean isIntaking = false;
-    public ElapsedTime acquireTimer;
+    public boolean isIntaking = false;
+    public boolean isLaunching = false;
+    public ElapsedTime darylsTimer;
+    public double launchingTargetTime = Double.MAX_VALUE;
     public DriveStation(Gamepad driverController, Gamepad operatorController) {
         driver = driverController;
         operator = operatorController;
-        acquireTimer = new ElapsedTime();
+        darylsTimer = new ElapsedTime();
         lastAcquire = false;
     }
 
@@ -41,23 +41,14 @@ public class DriveStation {
             isRedAlliance = !isRedAlliance;
         }
 
-        //Basic intaking control
         if(driver.bWasPressed()) {
             isIntaking = !isIntaking;
         }
-        if(isIntaking) {
-            intake = 1.0;
-            transport = 1.0;
-        } else {
-            intake = 0.0;
-            transport = 0.0;
-        }
 
-        //Basic launching control for now
-        if(driver.right_bumper) {
-            transport = 1.0;
+        isLaunching = driver.right_bumper;
+        if(driver.rightBumperWasPressed()) {
+            launchingTargetTime = darylsTimer.seconds() + SubSystemConfigs.TRANSPORT_DELAY;
         }
-        isStopRelease = driver.right_bumper;
 
 //        //driver score
 //        isScoreSpecimen = driver.right_bumper;

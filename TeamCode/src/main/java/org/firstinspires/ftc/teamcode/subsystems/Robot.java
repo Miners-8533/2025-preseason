@@ -11,14 +11,17 @@ public class Robot {
     private Chassis chassis;
     private Launcher launcher;
     private DriveStation driveStation;
-    //private Limelight limelight;
+    private Limelight limelight;
+    private boolean isDemoBot = false;
     private Intake intake;
     public Robot(HardwareMap hardwareMap, Gamepad driverController, Gamepad operatorController, Pose2d initialPose) {
         chassis = new Chassis(hardwareMap, initialPose);
         driveStation = new DriveStation(driverController, operatorController);
-        launcher = new Launcher(hardwareMap);
-        //limelight = new Limelight(hardwareMap);
-        intake = new Intake(hardwareMap);
+        if(!isDemoBot) {
+            launcher = new Launcher(hardwareMap);
+            intake = new Intake(hardwareMap);
+        }
+        limelight = new Limelight(hardwareMap);
     }
     public void updateTeleOp(Telemetry telemetry) {
         double desiredStrafe;
@@ -32,6 +35,11 @@ public class Robot {
         desiredStrafe = driveStation.strafe;
         desiredRotation = driveStation.rotation;
 
+        if(isDemoBot) {
+            desiredForward = -1.0*desiredForward;
+            desiredRotation = -1.0*desiredRotation;
+        }
+
         chassis.update(
                 desiredForward,
                 desiredStrafe,
@@ -42,23 +50,42 @@ public class Robot {
                 driveStation.isRedAlliance
         );
 
+        if(!isDemoBot) {
+            //Basic intaking control
+            if (driveStation.isIntaking) {
+                intake.intakePower = 1.0;
+                intake.transportPower = 1.0;
+            } else {
+                intake.intakePower = 0.0;
+                intake.transportPower = 0.0;
+            }
+            //Basic launching control for now
+            if (driveStation.isLaunching) {
+                if (driveStation.launchingTargetTime < driveStation.darylsTimer.seconds()) {
+                    intake.transportPower = 1.0;
+                }
+            }
+        }
+
         //distance get and send to launcher
-        if(driveStation.isStopRelease) {
+        if(driveStation.isLaunching) {
             launcher.stopTarget = SubSystemConfigs.STOP_OPEN;
         } else {
             launcher.stopTarget = SubSystemConfigs.STOP_LOCK;
         }
-        intake.intakePower = driveStation.intake;
-        intake.transportPower = driveStation.transport;
 
-        launcher.update();
-        //limelight.update();
-        intake.update();
+        if(!isDemoBot) {
+            launcher.update();
+            intake.update();
+        }
+        limelight.update();
 
         chassis.log(telemetry);
-        launcher.log(telemetry);
-        //limelight.log(telemetry);
-        intake.log(telemetry);
+        if(!isDemoBot) {
+            launcher.log(telemetry);
+            intake.log(telemetry);
+        }
+        limelight.log(telemetry);
 
         telemetry.update();
     }

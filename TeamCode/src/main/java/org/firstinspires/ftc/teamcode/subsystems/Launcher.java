@@ -16,14 +16,14 @@ public class Launcher {
     private DcMotorEx fly_motor;
     private DcMotorEx fly_follow;
     public static double targetVelocity = 0.0;
-    public static double kP = 1000.0;
-    public static double kD = 5.0;
-    public static double kF = 25.0;
+    public static double kP = 0.2;
+    public static double kD = 0;
+    public static double kF = 0.0;
     private Servo hood;
     private Servo stop;
     public static double hoodTarget = SubSystemConfigs.HOOD_MAX;
     public static double stopTarget = SubSystemConfigs.STOP_LOCK;
-    public static double kP_I = 0.0;
+    public static double kP_I = 0.0001;
     public static double kD_I = 0.0;
     public static double kF_I = 0.0;
     private FeedForwardController currentFollower;
@@ -43,7 +43,7 @@ public class Launcher {
         fly_motor.setDirection(DcMotorSimple.Direction.FORWARD);
         fly_motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         fly_motor.setMotorEnable();
-        fly_follow.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        fly_motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         fly_motor.setVelocity(0.0);
 
         fly_follow.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -94,10 +94,12 @@ public class Launcher {
 
         velocityPID.targetValue = targetVelocity;
         double newFlyMotorPower = velocityPID.update(fly_motor.getVelocity());
+        if(newFlyMotorPower < 0.0 ) {newFlyMotorPower = 0.0;}
         fly_motor.setPower(newFlyMotorPower);
 
         currentFollower.targetValue = fly_motor.getCurrent(CurrentUnit.MILLIAMPS);
         double newFollowPower = currentFollower.update(fly_follow.getCurrent(CurrentUnit.MILLIAMPS));
+        if(newFollowPower < 0.0 ) {newFollowPower = 0.0;}
         fly_follow.setPower(newFollowPower);
 
         hood.setPosition(hoodTarget);

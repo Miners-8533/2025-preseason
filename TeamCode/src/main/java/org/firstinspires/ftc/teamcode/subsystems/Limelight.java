@@ -16,7 +16,7 @@ public class Limelight {
     private Limelight3A limelight;
     private GoBildaPinpointDriver imu;
     private LLResult result;
-    private Pose3D botpose;
+    public Pose3D botpose;
     public Limelight(HardwareMap hardwareMap) {
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         limelight.setPollRateHz(100); // Asks the LL for data 100 times / second
@@ -36,8 +36,8 @@ public class Limelight {
     }
 
     public void log(Telemetry tele) {
-        tele.addData("tx", result.getTx());
-        tele.addData("ty", result.getTy());
+        //tele.addData("tx", result.getTx());
+        //tele.addData("ty", result.getTy());
         if (result != null && result.isValid()) {
             tele.addData("Botpose", botpose.toString());
         }
