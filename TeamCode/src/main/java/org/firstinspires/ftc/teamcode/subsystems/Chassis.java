@@ -16,13 +16,14 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 public class Chassis {
     private MecanumDrive drive;
     private FeedForwardController headingController;
-    public static double kP = 0.001;
+    public static double kP = 1.0;
     public static double kI = 0.0;
-    public static double kD = 0.001;
+    public static double kD = 1.0;
     public static double kS = 0.05;
     private double gyroOffset;
     private double commandedHeaading;
     private double targetHeading;
+    private double targetDist;
 
     public Chassis(HardwareMap hardwareMap, Pose2d initialPose) {
         drive = new MecanumDrive(hardwareMap, initialPose);
@@ -56,27 +57,33 @@ public class Chassis {
         Vector2d targetPos;
         if (isRedAlliance) {
             targetPos = robotPose.minus(RED_TARGET);
+            targetDist = RED_TARGET.minus(robotPose).norm();
         } else {
             targetPos = robotPose.minus(BLUE_TARGET);
+            targetDist = BLUE_TARGET.minus(robotPose).norm();
         }
         double targetHeading = (Math.atan2(targetPos.y, targetPos.x) + Math.PI);
-        targetHeading %= Math.PI; //Map onto (-PI,PI) range
+        if(targetHeading > Math.PI) {targetHeading -= 2*Math.PI;}
         headingController.targetValue = targetHeading;
         if(isTargetOrientedControl) {
             rotation = headingController.update(heading);
-            headingController.coefficients = new PIDCoefficients(kP, kI, kD);//TODO for config REMOVE
-            headingController.kStiction = kS; //TODO for config REMOVE
         }
 
         if (isFieldOrientedControl) {
-            heading = heading - Math.PI/2;//TODO need to change depending on alliance
-            heading %= Math.PI; //Map onto (-PI,PI) range
+//            if(isRedAlliance) {
+//                heading = heading - Math.PI/2;
+//            } else {
+//                heading = heading + Math.PI/2;
+//            }
+            heading = heading + Math.PI/2;
+            if(heading < -Math.PI) {heading += 2*Math.PI;}
+            if(heading >  Math.PI) {heading -= 2*Math.PI;}
             commanded_translation = rotate(forward, strafe, heading);
         } else {
             commanded_translation = new Vector2d(forward, strafe);
         }
 
-        commandedHeaading = heading;
+        commandedHeaading = rotation;
 
         //Chassis drive is run independent of robot state
         drive.setDrivePowers(
@@ -91,8 +98,9 @@ public class Chassis {
         tele.addData("Pinpoint X: ",drive.localizer.getPose().position.x);
         tele.addData("Pinpoint Y: ",drive.localizer.getPose().position.y);
         tele.addData("Pinpoint H: ",Math.toDegrees(drive.localizer.getPose().heading.toDouble()));
-        tele.addData("Target heading: ", Math.toDegrees(headingController.targetValue));
-        tele.addData("Heading effort: ", commandedHeaading);
+//        tele.addData("Target heading: ", Math.toDegrees(headingController.targetValue));
+//        tele.addData("Heading effort: ", commandedHeaading);
+        tele.addData("Dist to target", targetDist);
     }
 
     public void setPose(){
