@@ -16,18 +16,12 @@ public class Launcher {
     private DcMotorEx fly_motor;
     private DcMotorEx fly_follow;
     public static double targetVelocity = 0.0;
-    public static double kP = 0.2;
-    public static double kD = 0;
-    public static double kF = 0.0;
     private Servo hood;
     private Servo stop;
     public static double hoodTarget = SubSystemConfigs.HOOD_MAX;
-    public static double stopTarget = SubSystemConfigs.STOP_LOCK;
-    public static double kP_I = 0.0001;
-    public static double kD_I = 0.0;
-    public static double kF_I = 0.0;
-    private FeedForwardController currentFollower;
-    private FeedForwardController velocityPID;
+    public static double stopTarget = 0.5;//SubSystemConfigs.STOP_LOCK;
+
+    public boolean isSetForSpin = false;
     private final double[][] launchMap = {
             //Distance (in) , effort (ticks/second), angle (servo position [0,1.0]
             {0.0, 0.0, 0.0},//first point needs min values
@@ -51,12 +45,6 @@ public class Launcher {
         fly_follow.setMotorEnable();
         fly_follow.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         fly_follow.setPower(0.0);
-
-        currentFollower = new FeedForwardController(new PIDCoefficients(kP_I, 0.0, kD_I));
-        currentFollower.feedForwardFunc = (input)->{return kF_I*input;};
-
-        velocityPID = new FeedForwardController(new PIDCoefficients(kP,0.0,kD));
-        velocityPID.feedForwardFunc = (input)->{return kF*input;};
     }
 
     public void setDistance(double distance) {
@@ -86,21 +74,18 @@ public class Launcher {
         }
     }
 
+    public boolean isVelocityGood() {
+        return (fly_motor.getVelocity() > targetVelocity*0.9);
+    }
+
     public void update() {
-        velocityPID.coefficients = new PIDCoefficients(kP, 0.0, kD); //TODO for config REMOVE
-        velocityPID.feedForwardFunc = (input)->{return kF*input;}; //TODO for config REMOVE
-        currentFollower.coefficients = new PIDCoefficients(kP_I, 0.0, kD_I); //TODO for config REMOVE
-        currentFollower.feedForwardFunc = (input)->{return kF_I*input;}; //TODO for config REMOVE
-
-        velocityPID.targetValue = targetVelocity;
-        double newFlyMotorPower = velocityPID.update(fly_motor.getVelocity());
-        if(newFlyMotorPower < 0.0 ) {newFlyMotorPower = 0.0;}
-        fly_motor.setPower(newFlyMotorPower);
-
-        currentFollower.targetValue = fly_motor.getCurrent(CurrentUnit.MILLIAMPS);
-        double newFollowPower = currentFollower.update(fly_follow.getCurrent(CurrentUnit.MILLIAMPS));
-        if(newFollowPower < 0.0 ) {newFollowPower = 0.0;}
-        fly_follow.setPower(newFollowPower);
+            if ((fly_motor.getVelocity() > targetVelocity) || (targetVelocity == 0.0) || isSetForSpin) {
+                fly_motor.setPower(0.0);
+                fly_follow.setPower(0.0);
+            } else {
+                fly_motor.setPower(1.0);
+                fly_follow.setPower(1.0);
+            }
 
         hood.setPosition(hoodTarget);
         stop.setPosition(stopTarget);

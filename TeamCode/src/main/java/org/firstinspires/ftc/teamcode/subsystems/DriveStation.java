@@ -12,13 +12,16 @@ public class DriveStation {
     public double rotation;
     public boolean lastAcquire;
     public boolean isGyroReset;
-    public boolean isTargetOriented;
+    public boolean isTargetOriented = false;
     public boolean isRedAlliance;
     public boolean isStopRelease = false;
     public boolean isIntaking = false;
     public boolean isLaunching = false;
     public ElapsedTime darylsTimer;
     public double launchingTargetTime = Double.MAX_VALUE;
+    public double intakeBackoutTargetTime = 0.0;
+    public double transportBackoutTargetTime = 0.0;
+    public boolean isOuttaking = false;
     public DriveStation(Gamepad driverController, Gamepad operatorController) {
         driver = driverController;
         operator = operatorController;
@@ -43,12 +46,19 @@ public class DriveStation {
 
         if(driver.bWasPressed()) {
             isIntaking = !isIntaking;
+            if(!isIntaking) {
+                intakeBackoutTargetTime = darylsTimer.seconds() + SubSystemConfigs.INTAKE_BACKOUT_TIME;
+                transportBackoutTargetTime = intakeBackoutTargetTime + SubSystemConfigs.TRANSPORT_BACKOUT_TIME;
+            }
         }
+
+        isOuttaking = driver.dpad_down;
 
         isLaunching = driver.right_bumper;
         if(driver.rightBumperWasPressed()) {
             launchingTargetTime = darylsTimer.seconds() + SubSystemConfigs.TRANSPORT_DELAY;
         }
+
 
 //        //driver score
 //        isScoreSpecimen = driver.right_bumper;

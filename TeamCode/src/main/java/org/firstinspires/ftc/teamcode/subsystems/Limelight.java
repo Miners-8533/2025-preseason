@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
@@ -39,7 +40,10 @@ public class Limelight {
         //tele.addData("tx", result.getTx());
         //tele.addData("ty", result.getTy());
         if (result != null && result.isValid()) {
-            tele.addData("Botpose", botpose.toString());
+            //tele.addData("Botpose", botpose.toString());
+            tele.addData("Limelight H: ", botpose.getOrientation().getYaw(AngleUnit.DEGREES));
+            tele.addData("Limelight X: ", botpose.getPosition().toUnit(DistanceUnit.INCH).x);
+            tele.addData("Limelight Y: ", botpose.getPosition().toUnit(DistanceUnit.INCH).y);
         }
     }
 }
