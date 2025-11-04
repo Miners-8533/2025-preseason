@@ -1,5 +1,9 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import androidx.annotation.NonNull;
+
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -104,5 +108,55 @@ public class Robot {
     public MecanumDrive getMecanumDrive() {
         return chassis.getMecanumDrive();
     }
-
+    public Action autonUpdate(){
+        return new Action(){
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                launcher.update();
+                intake.update();
+                limelight.update();
+                chassis.setPose();
+                return true; //never stop
+            }
+        };
+    }
+    public Action readyLaunch(){
+        return new Action(){
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                launcher.stopTarget = SubSystemConfigs.STOP_OPEN;
+                launcher.isSetForSpin = true;
+                launcher.setDistance(0.0);//TODO get dist
+                intake.intakePower = SubSystemConfigs.INTAKE_STOP;
+                intake.transportPower = SubSystemConfigs.TRANSPORT_STOP;
+                return false;
+            }
+        };
+    }
+    public Action launch(){
+        return new Action(){
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                launcher.stopTarget = SubSystemConfigs.STOP_OPEN;
+                launcher.isSetForSpin = true;
+                launcher.setDistance(0.0);//TODO get dist
+                intake.intakePower = SubSystemConfigs.INTAKE_MAX;
+                intake.transportPower = SubSystemConfigs.TRANSPORT_MAX;
+                return false;
+            }
+        };
+    }
+    public Action runIntake(){
+        return new Action(){
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                launcher.stopTarget = SubSystemConfigs.STOP_LOCK;
+                launcher.isSetForSpin = false;
+                //launcher.setDistance(0.0);//no need to change target velocity or hood
+                intake.intakePower = SubSystemConfigs.INTAKE_MAX;
+                intake.transportPower = SubSystemConfigs.INTAKE_MAX;
+                return false;
+            }
+        };
+    }
 }
