@@ -40,6 +40,6 @@ public class Intake {
         tele.addData("Intake power (+/-%FS)",            intake.getPower());
         tele.addData("Transport current (A)",            transport.getCurrent(CurrentUnit.AMPS));
         tele.addData("Transport power (+/-%FS)",         transport.getPower());
-        tele.addData("Transport position (ticks)",         transport.getCurrentPosition());
+        //tele.addData("Transport position (ticks)",         transport.getCurrentPosition());
     }
 }

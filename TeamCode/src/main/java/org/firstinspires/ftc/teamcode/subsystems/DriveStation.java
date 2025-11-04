@@ -12,14 +12,13 @@ public class DriveStation {
     public double rotation;
     public boolean lastAcquire;
     public boolean isGyroReset;
-    public boolean isTargetOriented = false;
+    public boolean isFieldOriented = true;
+    public boolean isTargetLocked = false;
     public boolean isRedAlliance;
-    public boolean isStopRelease = false;
     public boolean isIntaking = false;
     public boolean isLaunching = false;
+    public boolean isLaunchingPressed = false;
     public ElapsedTime darylsTimer;
-    public double launchingTargetTime = Double.MAX_VALUE;
-    public double intakeBackoutTargetTime = 0.0;
     public double transportBackoutTargetTime = 0.0;
     public boolean isOuttaking = false;
     public DriveStation(Gamepad driverController, Gamepad operatorController) {
@@ -34,73 +33,37 @@ public class DriveStation {
         forward = -driver.left_stick_y;
         strafe = -driver.left_stick_x;
         rotation = -driver.right_stick_x / 2.0;
-        isGyroReset = driver.back;
 
-        if(driver.yWasPressed()) {
-            isTargetOriented = !isTargetOriented;
+        //TODO do we leave this in or force move to robot oriented control?
+        isGyroReset = driver.back;
+        //Manual override for loss of gyro
+        if(driver.startWasPressed()) {isFieldOriented = !isFieldOriented;}
+
+        //Target lock
+        if(operator.yWasPressed()) {
+            isTargetLocked = !isTargetLocked;
         }
 
-        if(driver.xWasPressed()) {
+        //TODO for debug should be sourced from auton
+        if(operator.xWasPressed()) {
             isRedAlliance = !isRedAlliance;
         }
 
-        if(driver.bWasPressed()) {
+        //Intake
+        if(operator.aWasPressed()) {
             isIntaking = !isIntaking;
             if(!isIntaking) {
-                intakeBackoutTargetTime = darylsTimer.seconds() + SubSystemConfigs.INTAKE_BACKOUT_TIME;
-                transportBackoutTargetTime = intakeBackoutTargetTime + SubSystemConfigs.TRANSPORT_BACKOUT_TIME;
+                transportBackoutTargetTime = darylsTimer.seconds() + SubSystemConfigs.TRANSPORT_BACKOUT_TIME;
             }
         }
 
-        isOuttaking = driver.dpad_down;
+        //Outake
+        isOuttaking = operator.dpad_down;
 
-        isLaunching = driver.right_bumper;
-        if(driver.rightBumperWasPressed()) {
-            launchingTargetTime = darylsTimer.seconds() + SubSystemConfigs.TRANSPORT_DELAY;
-        }
+        //Launch
+        //Must stay harmonized to the same button
+        isLaunching = operator.right_bumper;
+        isLaunchingPressed = operator.rightBumperWasPressed();
 
-
-//        //driver score
-//        isScoreSpecimen = driver.right_bumper;
-//        isOutakeSample = driver.right_bumper;
-//
-//        //driver reset
-//        isReady = driver.y;
-//
-//        //operator climb
-//        isClimb = operator.dpad_up;
-//        isClimbPrep = operator.dpad_right || operator.dpad_left;
-//        isClimbReset = operator.dpad_down;
-
-        //operator acquire
-
-//        lastAcquire = isAquireSample;
-//        isAquireSample = operator.right_bumper;
-//        isTargetSample = operator.right_trigger > 0.5;
-//        if(isAquireSample != lastAcquire) {
-//            acquireTimer.reset();
-//        }
-//
-//        //operator bumper override
-//        isBumperDown = operator.left_trigger > 0.5;
-//
-//        isWingDown = operator.left_bumper;
-//
-//        //operator prepare for high basket
-//        isScoreBasket = operator.y;
-//
-//        //operator scrubs
-//        reachScrub = operator.right_stick_y;
-//        liftScrub = operator.left_stick_y;
-//
-//        //operator conditional drive
-//        if(isTargetSample) {
-//            forward = forward - operator.left_stick_y;
-//            forward = Math.max(Math.min(1.0, forward), -1.0);
-//            strafe = strafe - operator.left_stick_x;
-//            strafe = Math.max(Math.min(1.0, strafe), -1.0);
-//            //rotation = rotation - operator.right_stick_x / 3.0;
-//            //rotation = Math.max(Math.min(1.0, rotation), -1.0);
-//        }
     }
 }

@@ -21,82 +21,84 @@ public class Robot {
         limelight = new Limelight(hardwareMap);
     }
     public void updateTeleOp(Telemetry telemetry) {
-        double desiredStrafe;
-        double desiredForward;
-        double desiredRotation;
-
         //get fresh inputs first
         driveStation.update();
 
-        desiredForward = driveStation.forward;
-        desiredStrafe = driveStation.strafe;
-        desiredRotation = driveStation.rotation;
+        double desiredForward = driveStation.forward;
+        double desiredStrafe = driveStation.strafe;
+        double desiredRotation = driveStation.rotation;
 
+        //Basic intaking control
+        if (driveStation.isIntaking) {
+            intake.intakePower = SubSystemConfigs.INTAKE_MAX;
+            //TODO may need a stop lockout time delay before moving transport
+            intake.transportPower = SubSystemConfigs.TRANSPORT_INTAKE;
+        } else if(driveStation.transportBackoutTargetTime > driveStation.darylsTimer.seconds()) {
+            intake.intakePower = -0.0;
+            intake.transportPower = SubSystemConfigs.TRANSPORT_BACKOUT;
+        } else {
+            intake.intakePower = SubSystemConfigs.INTAKE_STOP;
+            intake.transportPower = SubSystemConfigs.TRANSPORT_STOP;
+        }
+
+        if(driveStation.isOuttaking) {
+            intake.intakePower = SubSystemConfigs.INTAKE_OUTAKE;
+            intake.transportPower = SubSystemConfigs.TRANSPORT_OUTAKE;
+        }
+
+        //Launch control
+        //Target lock
+        if(driveStation.isTargetLocked) {
+            launcher.stopTarget = SubSystemConfigs.STOP_OPEN;
+            intake.intakePower = 0.0;
+            intake.transportPower = 0.0;
+        } else {
+            launcher.stopTarget = SubSystemConfigs.STOP_LOCK;
+        }
+
+        //only spin up if target locked for now
+        //TODO need to consider manual aiming case
+        launcher.isSetForSpin = driveStation.isTargetLocked;
+
+        //TODO need to set distance of Launcher for angle/speed targets
+        //launcher.setDistance(chassis.targetDist);
+
+        if(driveStation.isLaunchingPressed) {
+            launcher.isFirstLaunch = true;
+        }
+
+        if (driveStation.isLaunching) {
+            if (launcher.isVelocityGood()) {
+                intake.transportPower = SubSystemConfigs.TRANSPORT_MAX;
+                //run intake while shooting to make sure artifacts move through transport
+                intake.intakePower = SubSystemConfigs.INTAKE_MAX;
+            } else {
+                //Hold feed until we are up to flywheel speed
+                intake.transportPower = SubSystemConfigs.TRANSPORT_STOP;
+            }
+        }
+
+        //All updates grouped together (except driveStation)
+        launcher.update();
+        intake.update();
+        limelight.update();
         chassis.update(
                 desiredForward,
                 desiredStrafe,
                 desiredRotation,
                 true,
                 driveStation.isGyroReset,
-                driveStation.isTargetOriented,
+                driveStation.isTargetLocked,
                 driveStation.isRedAlliance
         );
 
-        //Basic intaking control
-        if (driveStation.isIntaking) {
-            intake.intakePower = 1.0;
-            intake.transportPower = 0.25;
-        } else if(driveStation.intakeBackoutTargetTime > driveStation.darylsTimer.seconds()) {
-            intake.intakePower = -0.0;
-            intake.transportPower = -0.5;
-        } else {
-            intake.intakePower = 0.0;
-            intake.transportPower = 0.0;
-        }
-
-        if(driveStation.isOuttaking) {
-            intake.intakePower = -1.0;
-            intake.transportPower = -1.0;
-        }
-
-        //Basic launching control for now
-        if (driveStation.isLaunching) {
-            if (launcher.isVelocityGood()) {
-                intake.transportPower = 1.0;
-                intake.transportPower = 1.0;
-            } else {
-                //Hold feed until we are up to flywheel speed
-                intake.transportPower = 0.0;
-            }
-        }
-
-        //only spin up if target locked for now
-        //TODO need to consider manual aiming case
-        launcher.isSetForSpin = !driveStation.isTargetOriented;
-
-        //TODO need to set distance of Launcher for angle/speed targets
-
-        //distance get and send to launcher
-        if(driveStation.isTargetOriented) {
-            launcher.stopTarget = SubSystemConfigs.STOP_OPEN;
-        } else {
-            launcher.stopTarget = SubSystemConfigs.STOP_LOCK;
-        }
-
-        //spin intake on shoot
-        //target for first needs to be 100 for first shot
-        //intake cannot be running during target lock
-        //need time delay for lock to close
-
-        launcher.update();
-        intake.update();
-        limelight.update();
-
+        //All logs grouped together
         chassis.log(telemetry);
         launcher.log(telemetry);
         intake.log(telemetry);
         limelight.log(telemetry);
 
+        //Must come after logs and is best if last thing in TeleOp function
         telemetry.update();
     }
     public MecanumDrive getMecanumDrive() {

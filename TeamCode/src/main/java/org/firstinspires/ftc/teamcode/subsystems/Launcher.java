@@ -5,7 +5,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.PIDCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -19,8 +18,8 @@ public class Launcher {
     private Servo hood;
     private Servo stop;
     public static double hoodTarget = SubSystemConfigs.HOOD_MAX;
-    public static double stopTarget = 0.5;//SubSystemConfigs.STOP_LOCK;
-
+    public double stopTarget = SubSystemConfigs.STOP_LOCK;
+    public boolean isFirstLaunch = false;
     public boolean isSetForSpin = false;
     private final double[][] launchMap = {
             //Distance (in) , effort (ticks/second), angle (servo position [0,1.0]
@@ -75,11 +74,22 @@ public class Launcher {
     }
 
     public boolean isVelocityGood() {
-        return (fly_motor.getVelocity() > targetVelocity*0.9);
+        double velocity = fly_motor.getVelocity();
+        double threshold = targetVelocity;
+        if(isFirstLaunch) {
+            threshold *= 1.0;
+        } else {
+            threshold *= 0.9;
+        }
+        boolean isThresholdMet = velocity > threshold;
+        if(isThresholdMet && isFirstLaunch) {
+            isFirstLaunch = false;
+        }
+        return isThresholdMet;
     }
 
     public void update() {
-            if ((fly_motor.getVelocity() > targetVelocity) || (targetVelocity == 0.0) || isSetForSpin) {
+            if ((fly_motor.getVelocity() > targetVelocity) || (targetVelocity == 0.0) || !isSetForSpin) {
                 fly_motor.setPower(0.0);
                 fly_follow.setPower(0.0);
             } else {

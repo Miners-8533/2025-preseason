@@ -23,7 +23,7 @@ public class Chassis {
     private double gyroOffset;
     private double commandedHeaading;
     private double targetHeading;
-    private double targetDist;
+    public double targetDist;
 
     public Chassis(HardwareMap hardwareMap, Pose2d initialPose) {
         drive = new MecanumDrive(hardwareMap, initialPose);
@@ -62,7 +62,7 @@ public class Chassis {
             targetPos = robotPose.minus(BLUE_TARGET);
             targetDist = BLUE_TARGET.minus(robotPose).norm();
         }
-        double targetHeading = (Math.atan2(targetPos.y, targetPos.x) + Math.PI);
+        targetHeading = (Math.atan2(targetPos.y, targetPos.x) + Math.PI);
         if(targetHeading > Math.PI) {targetHeading -= 2*Math.PI;}
         headingController.targetValue = targetHeading;
         if(isTargetOrientedControl) {
