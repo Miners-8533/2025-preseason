@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -23,9 +24,9 @@ public class Launcher {
     public boolean isSetForSpin = false;
     private final double[][] launchMap = {
             //Distance (in) , effort (ticks/second), angle (servo position [0,1.0]
-            {0.0, 0.0, 0.0},//first point needs min values
-            {0.0, 0.0, 0.0},
-            {0.0, 740.0, 0.57}//last point needs max values
+            {0.0, 740.0, 0.57},//first point needs min values
+            {120.0, 740.0, 0.57},
+            {200.0, 740.0, 0.57}//last point needs max values
     };
     public Launcher(HardwareMap hardwareMap) {
         fly_motor = hardwareMap.get(DcMotorEx.class, "fly_motor_enc");
@@ -73,6 +74,11 @@ public class Launcher {
         }
     }
 
+    void autonSet(double hood, double vel) {
+        targetVelocity = vel;
+        hoodTarget = hood;
+    }
+
     public boolean isVelocityGood() {
         double velocity = fly_motor.getVelocity();
         double threshold = targetVelocity;
@@ -80,6 +86,20 @@ public class Launcher {
             threshold *= 1.0;
         } else {
             threshold *= 0.9;
+        }
+        boolean isThresholdMet = velocity > threshold;
+        if(isThresholdMet && isFirstLaunch) {
+            isFirstLaunch = false;
+        }
+        return isThresholdMet;
+    }
+    public boolean isVelocityGoodAuton() {
+        double velocity = fly_motor.getVelocity();
+        double threshold = targetVelocity;
+        if(isFirstLaunch) {
+            threshold *= 1.0;
+        } else {
+            threshold *= 0.95;
         }
         boolean isThresholdMet = velocity > threshold;
         if(isThresholdMet && isFirstLaunch) {
@@ -106,6 +126,12 @@ public class Launcher {
         tele.addData("Follow motor current (mA)",            fly_follow.getCurrent(CurrentUnit.MILLIAMPS));
         tele.addData("Fly motor power (+/-%FS)",            fly_motor.getPower());
         tele.addData("Follow motor power (+/-%FS)",         fly_follow.getPower());
+    }
+
+    public void autonLog(TelemetryPacket packet) {
+        packet.put("Velocity Measured: ", fly_motor.getVelocity());
+        packet.put("Velocity Target: ", targetVelocity);
+        packet.put("isVelocityGood", isVelocityGood());
     }
 
 }

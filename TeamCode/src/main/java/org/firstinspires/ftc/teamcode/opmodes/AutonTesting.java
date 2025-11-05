@@ -21,23 +21,34 @@ public class AutonTesting extends LinearOpMode {
     @Override
     public void runOpMode() {
         Pose2d initialPose = new Pose2d(64.5,-17.5, Math.toRadians(180));
-        Pose2d pickLoadingZoneStart = new Pose2d(51.5,-61, Math.toRadians(-45));
-        Pose2d pickLoadingZoneEnd = new Pose2d(64.5,-61, Math.toRadians(0));
-        Pose2d farScorePose = new Pose2d(57, -12,Math.toRadians(200));
+        Pose2d pickLoadingZoneStart = new Pose2d(40,-65, Math.toRadians(0));
+        Pose2d pickLoadingZoneEnd = new Pose2d(58,-65, Math.toRadians(0));
+        Pose2d farScorePose = new Pose2d(57, -12,Math.toRadians(203));
+        Pose2d pickCloseGroup = new Pose2d(35,-26, Math.toRadians(-90));
+        Pose2d pickCloseGroupSweep = new Pose2d(35,-58, Math.toRadians(-90));
 
         Robot robot = new Robot(hardwareMap,gamepad1,gamepad2, initialPose);
         MecanumDrive drive = robot.getMecanumDrive();
 
         TrajectoryActionBuilder tab1 = drive.actionBuilder(initialPose)
-                .splineToLinearHeading(farScorePose, Math.toRadians(90), null, new ProfileAccelConstraint(-5,5));
+                .splineToLinearHeading(farScorePose, Math.toRadians(90), null, new ProfileAccelConstraint(-30,30));
 
         TrajectoryActionBuilder tab2 = drive.actionBuilder(farScorePose)
-                .splineToLinearHeading(pickLoadingZoneStart, Math.toRadians(90),null, new ProfileAccelConstraint(-5,5))
-                .splineToLinearHeading(pickLoadingZoneEnd, Math.toRadians(90), null, new ProfileAccelConstraint(-5,5));
+                .splineToLinearHeading(pickCloseGroup, Math.toRadians(270),null, new ProfileAccelConstraint(-30,30))
+                .splineToLinearHeading(pickCloseGroupSweep, Math.toRadians(270),null, new ProfileAccelConstraint(-30,30));
 
-        TrajectoryActionBuilder tab3 = drive.actionBuilder(pickLoadingZoneEnd)
+        TrajectoryActionBuilder tab3 = drive.actionBuilder(pickCloseGroupSweep)
                 .setReversed(true)
-                .splineToLinearHeading(farScorePose, Math.toRadians(90), null, new ProfileAccelConstraint(-5,5));
+                //.setTangent(Math.toRadians(45))
+                .splineToLinearHeading(farScorePose, Math.toRadians(270), null, new ProfileAccelConstraint(-30,30));
+
+        TrajectoryActionBuilder tab4 = drive.actionBuilder(farScorePose)
+                .splineToLinearHeading(pickLoadingZoneStart, Math.toRadians(0),null, new ProfileAccelConstraint(-30,30))
+                .splineToLinearHeading(pickLoadingZoneEnd, Math.toRadians(0), null, new ProfileAccelConstraint(-30,30));
+
+        TrajectoryActionBuilder tab5 = drive.actionBuilder(pickLoadingZoneEnd)
+                .setReversed(true)
+                .splineToLinearHeading(farScorePose, Math.toRadians(90), null, new ProfileAccelConstraint(-30,30));
 
 /*
         TrajectoryActionBuilder tab1 = drive.actionBuilder(initialPose)
@@ -80,19 +91,18 @@ public class AutonTesting extends LinearOpMode {
                 tab1.build()
             ),
             //may need velocity guard here
-            new ParallelAction(
-                    robot.launch(),
-                    new SleepAction(2.0)
-            ),
+            robot.launch(),
             robot.runIntake(),
             tab2.build(),
             robot.readyLaunch(),
             tab3.build(),
-            new ParallelAction(
-                    robot.launch(),
-                    new SleepAction(2.0)
-            )
-                /*,
+            robot.launch(),
+            robot.runIntake(),
+            tab4.build(),
+            robot.readyLaunch(),
+            tab5.build(),
+            robot.launch()
+            /*,
             robot.scoreThree()*/
 
 //                new ParallelAction(

@@ -7,6 +7,7 @@ import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
@@ -126,7 +127,7 @@ public class Robot {
             public boolean run(@NonNull TelemetryPacket packet) {
                 launcher.stopTarget = SubSystemConfigs.STOP_OPEN;
                 launcher.isSetForSpin = true;
-                launcher.setDistance(0.0);//TODO get dist
+                launcher.autonSet(0.57, 760.0);
                 intake.intakePower = SubSystemConfigs.INTAKE_STOP;
                 intake.transportPower = SubSystemConfigs.TRANSPORT_STOP;
                 return false;
@@ -135,14 +136,27 @@ public class Robot {
     }
     public Action launch(){
         return new Action(){
+            private boolean firstRun = true;
+            private ElapsedTime timeOut = new ElapsedTime();
+            private double target = Double.MAX_VALUE;
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                launcher.stopTarget = SubSystemConfigs.STOP_OPEN;
-                launcher.isSetForSpin = true;
-                launcher.setDistance(0.0);//TODO get dist
-                intake.intakePower = SubSystemConfigs.INTAKE_MAX;
-                intake.transportPower = SubSystemConfigs.TRANSPORT_MAX;
-                return false;
+                if(firstRun) {
+                    firstRun = false;
+                    launcher.isFirstLaunch = true;
+                    launcher.stopTarget = SubSystemConfigs.STOP_OPEN;
+                    launcher.isSetForSpin = true;
+                    launcher.autonSet(0.57, 760.0);
+                    intake.intakePower = SubSystemConfigs.INTAKE_MAX;
+                    target = timeOut.seconds() + 2.25;
+                }
+                launcher.autonLog(packet);
+                if(launcher.isVelocityGoodAuton()) {
+                    intake.transportPower = SubSystemConfigs.TRANSPORT_MAX;
+                } else {
+                    intake.transportPower = SubSystemConfigs.TRANSPORT_STOP;
+                }
+                return timeOut.seconds() < target;
             }
         };
     }
@@ -152,7 +166,7 @@ public class Robot {
             public boolean run(@NonNull TelemetryPacket packet) {
                 launcher.stopTarget = SubSystemConfigs.STOP_LOCK;
                 launcher.isSetForSpin = false;
-                //launcher.setDistance(0.0);//no need to change target velocity or hood
+                launcher.autonSet(0.58, 0.0);
                 intake.intakePower = SubSystemConfigs.INTAKE_MAX;
                 intake.transportPower = SubSystemConfigs.INTAKE_MAX;
                 return false;
