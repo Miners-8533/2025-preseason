@@ -39,31 +39,19 @@ public class DriveStation {
         //Manual override for loss of gyro
         if(driver.startWasPressed()) {isFieldOriented = !isFieldOriented;}
 
-        //Target lock
-        if(operator.yWasPressed()) {
-            isTargetLocked = !isTargetLocked;
-        }
-
         //TODO for debug should be sourced from auton
-        if(operator.xWasPressed()) {
+        if(driver.xWasPressed()) {
             isRedAlliance = !isRedAlliance;
         }
 
-        //Intake
-        if(operator.aWasPressed()) {
-            isIntaking = !isIntaking;
-            if(!isIntaking) {
-                transportBackoutTargetTime = darylsTimer.seconds() + SubSystemConfigs.TRANSPORT_BACKOUT_TIME;
-            }
-        }
+        //Target lock
+        isTargetLocked = operator.a;
 
         //Outake
         isOuttaking = operator.dpad_down;
 
         //Launch
-        //Must stay harmonized to the same button
         isLaunching = operator.right_bumper;
-        isLaunchingPressed = operator.rightBumperWasPressed();
 
     }
 }

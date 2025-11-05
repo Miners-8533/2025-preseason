@@ -15,7 +15,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 public class Launcher {
     private DcMotorEx fly_motor;
     private DcMotorEx fly_follow;
-    public static double targetVelocity = 0.0;
+    public static double targetVelocity = 740.0;//0.0;
     private Servo hood;
     private Servo stop;
     public static double hoodTarget = SubSystemConfigs.HOOD_MAX;

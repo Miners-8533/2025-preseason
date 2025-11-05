@@ -24,7 +24,6 @@ public class Chassis {
     private double commandedHeaading;
     private double targetHeading;
     public double targetDist;
-
     public Chassis(HardwareMap hardwareMap, Pose2d initialPose) {
         drive = new MecanumDrive(hardwareMap, initialPose);
         gyroOffset = 0;
@@ -38,7 +37,7 @@ public class Chassis {
             double rotation,
             boolean isFieldOrientedControl,
             boolean isGyroReset,
-            boolean isTargetOrientedControl,
+            boolean isTargetLock,
             boolean isRedAlliance
     ) {
         drive.updatePoseEstimate();
@@ -49,24 +48,10 @@ public class Chassis {
         }
         heading = heading - gyroOffset;
 
-        Vector2d BLUE_TARGET = new Vector2d(-64,-56);
-        Vector2d RED_TARGET = new Vector2d(-64,64);
-
         //Controller for target heading lock
-        Vector2d robotPose = drive.localizer.getPose().position;
-        Vector2d targetPos;
-        if (isRedAlliance) {
-            targetPos = robotPose.minus(RED_TARGET);
-            targetDist = RED_TARGET.minus(robotPose).norm();
-        } else {
-            targetPos = robotPose.minus(BLUE_TARGET);
-            targetDist = BLUE_TARGET.minus(robotPose).norm();
-        }
-        targetHeading = (Math.atan2(targetPos.y, targetPos.x) + Math.PI);
-        if(targetHeading > Math.PI) {targetHeading -= 2*Math.PI;}
-        headingController.targetValue = targetHeading;
-        if(isTargetOrientedControl) {
-            rotation = headingController.update(heading);
+        if(isTargetLock) {
+            //override driver rotation command with target lock controller
+            rotation = calcTargetLock(isRedAlliance, heading);
         }
 
         if (isFieldOrientedControl) {
@@ -92,6 +77,25 @@ public class Chassis {
                         rotation
                 )
         );
+    }
+
+    public double calcTargetLock(boolean isRedAlliance, double currentHeading) {
+        Vector2d BLUE_TARGET = new Vector2d(-64,-56);
+        Vector2d RED_TARGET = new Vector2d(-64,64);
+        Vector2d robotPose = drive.localizer.getPose().position;
+        Vector2d targetPos;
+        if (isRedAlliance) {
+            targetPos = robotPose.minus(RED_TARGET);
+            targetDist = RED_TARGET.minus(robotPose).norm();
+        } else {
+            targetPos = robotPose.minus(BLUE_TARGET);
+            targetDist = BLUE_TARGET.minus(robotPose).norm();
+        }
+        targetHeading = (Math.atan2(targetPos.y, targetPos.x) + Math.PI);
+        if(targetHeading > Math.PI) {targetHeading -= 2*Math.PI;}
+        headingController.targetValue = targetHeading;
+
+        return headingController.update(currentHeading);
     }
 
     public void log(Telemetry tele) {

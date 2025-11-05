@@ -5,6 +5,8 @@ import androidx.annotation.NonNull;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.PoseVelocity2d;
+import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -18,12 +20,27 @@ public class Robot {
     private DriveStation driveStation;
     private Limelight limelight;
     private Intake intake;
-    public Robot(HardwareMap hardwareMap, Gamepad driverController, Gamepad operatorController, Pose2d initialPose) {
+    private boolean isRedAlliance;
+    private RobotState robotState;
+    private ElapsedTime time;
+    private enum RobotState {
+        READY,
+        INTAKE_PREP,
+        INTAKING,
+        INTAKE_FINISH,
+        TARGET_LOCK_PREP,
+        TARGET_LOCK,
+        LAUNCHING
+    }
+        public Robot(HardwareMap hardwareMap, Gamepad driverController, Gamepad operatorController, Pose2d initialPose) {
         chassis = new Chassis(hardwareMap, initialPose);
         driveStation = new DriveStation(driverController, operatorController);
         launcher = new Launcher(hardwareMap);
         intake = new Intake(hardwareMap);
         limelight = new Limelight(hardwareMap);
+        this.isRedAlliance = false;
+        robotState = RobotState.INTAKE_PREP;
+        time = new ElapsedTime();
     }
     public void updateTeleOp(Telemetry telemetry) {
         //get fresh inputs first
@@ -33,54 +50,87 @@ public class Robot {
         double desiredStrafe = driveStation.strafe;
         double desiredRotation = driveStation.rotation;
 
-        //Basic intaking control
-        if (driveStation.isIntaking) {
-            intake.intakePower = SubSystemConfigs.INTAKE_MAX;
-            //TODO may need a stop lockout time delay before moving transport
-            intake.transportPower = SubSystemConfigs.TRANSPORT_INTAKE;
-        } else if(driveStation.transportBackoutTargetTime > driveStation.darylsTimer.seconds()) {
-            intake.intakePower = -0.0;
-            intake.transportPower = SubSystemConfigs.TRANSPORT_BACKOUT;
-        } else {
-            intake.intakePower = SubSystemConfigs.INTAKE_STOP;
-            intake.transportPower = SubSystemConfigs.TRANSPORT_STOP;
+        /* Desired controls are to always intake unless target locking (with a) and launch with
+         * right bumper. When intaking starts the intake can run immediately and flywheel stop, but
+         * the transport needs to wait for the gate to close. On entering target lock the transport
+         * needs to backout slightly. When launching from the target lock state the transport has to
+         * wait for the gate to open. When launching the intake should always run and the transport
+         * depending on flywheel velocity. Outake should override intake and transport behavior.
+         */
+
+        switch(robotState) {//every state needs to set intake and transport b/c override
+            case INTAKE_PREP:
+                intake.intakePower = SubSystemConfigs.INTAKE_RUN;
+                intake.transportPower = SubSystemConfigs.TRANSPORT_STOP;
+                launcher.stopTarget = SubSystemConfigs.STOP_LOCK;
+                robotState = RobotState.INTAKING;
+                launcher.isSetForSpin = false;
+                time.reset();
+                break;
+            case INTAKING:
+                intake.intakePower = SubSystemConfigs.INTAKE_RUN;
+                if(time.seconds() < SubSystemConfigs.STOP_DELAY) {
+                    intake.transportPower = SubSystemConfigs.TRANSPORT_STOP;
+                } else {
+                    intake.transportPower = SubSystemConfigs.TRANSPORT_INTAKE;
+                }
+                if(driveStation.isTargetLocked) {
+                    robotState = RobotState.INTAKE_FINISH;
+                    time.reset();
+                }
+                break;
+            case INTAKE_FINISH:
+                intake.intakePower = SubSystemConfigs.INTAKE_RUN;
+                intake.transportPower = SubSystemConfigs.TRANSPORT_BACKOUT;
+                if(time.seconds() >= SubSystemConfigs.TRANSPORT_BACKOUT_TIME) {
+                    robotState = RobotState.TARGET_LOCK_PREP;
+                    time.reset();
+                }
+                break;
+            case TARGET_LOCK_PREP:
+                intake.intakePower = SubSystemConfigs.INTAKE_STOP;
+                intake.transportPower = SubSystemConfigs.TRANSPORT_STOP;
+                launcher.stopTarget = SubSystemConfigs.STOP_OPEN;
+                launcher.isSetForSpin = true;
+                launcher.isFirstLaunch = true;
+                if(time.seconds() >= SubSystemConfigs.STOP_DELAY) {
+                    robotState = RobotState.TARGET_LOCK;
+                }
+                break;
+            case TARGET_LOCK:
+                if (driveStation.isLaunching) {
+                    //run intake while shooting to make sure artifacts move through transport
+                    intake.intakePower = SubSystemConfigs.INTAKE_MAX;
+                    if (launcher.isVelocityGood()) {
+                        intake.transportPower = SubSystemConfigs.TRANSPORT_MAX;
+                    } else {
+                        //Hold feed until we are up to flywheel speed
+                        intake.transportPower = SubSystemConfigs.TRANSPORT_STOP;
+                    }
+                } else {
+                    intake.intakePower = SubSystemConfigs.INTAKE_STOP;
+                    intake.transportPower = SubSystemConfigs.TRANSPORT_STOP;
+                }
+                if(!driveStation.isTargetLocked) {
+                    robotState = RobotState.INTAKE_PREP;
+                }
+                break;
+            default: //For safety
+                intake.intakePower = SubSystemConfigs.INTAKE_STOP;
+                intake.transportPower = SubSystemConfigs.TRANSPORT_STOP;
+                launcher.stopTarget = SubSystemConfigs.STOP_LOCK;
+                launcher.isSetForSpin = false;
+                break;
         }
 
-        if(driveStation.isOuttaking) {
-            intake.intakePower = SubSystemConfigs.INTAKE_OUTAKE;
-            intake.transportPower = SubSystemConfigs.TRANSPORT_OUTAKE;
-        }
-
-        //Launch control
-        //Target lock
-        if(driveStation.isTargetLocked) {
-            launcher.stopTarget = SubSystemConfigs.STOP_OPEN;
-            intake.intakePower = 0.0;
-            intake.transportPower = 0.0;
-        } else {
-            launcher.stopTarget = SubSystemConfigs.STOP_LOCK;
-        }
-
-        //only spin up if target locked for now
-        //TODO need to consider manual aiming case
-        launcher.isSetForSpin = driveStation.isTargetLocked;
-
+        // State independent
         //TODO need to set distance of Launcher for angle/speed targets
         //launcher.setDistance(chassis.targetDist);
 
-        if(driveStation.isLaunchingPressed) {
-            launcher.isFirstLaunch = true;
-        }
-
-        if (driveStation.isLaunching) {
-            if (launcher.isVelocityGood()) {
-                intake.transportPower = SubSystemConfigs.TRANSPORT_MAX;
-                //run intake while shooting to make sure artifacts move through transport
-                intake.intakePower = SubSystemConfigs.INTAKE_MAX;
-            } else {
-                //Hold feed until we are up to flywheel speed
-                intake.transportPower = SubSystemConfigs.TRANSPORT_STOP;
-            }
+        // State independent overrides
+        if(driveStation.isOuttaking) {
+            intake.intakePower = SubSystemConfigs.INTAKE_OUTAKE;
+            intake.transportPower = SubSystemConfigs.TRANSPORT_OUTAKE;
         }
 
         //All updates grouped together (except driveStation)
@@ -170,6 +220,31 @@ public class Robot {
                 intake.intakePower = SubSystemConfigs.INTAKE_MAX;
                 intake.transportPower = SubSystemConfigs.INTAKE_MAX;
                 return false;
+            }
+        };
+    }
+    public Action targetLock(){//must not be run at same time as a trajectory action
+        return new Action(){
+            private ElapsedTime timeOut = new ElapsedTime();
+            private boolean firstRun = true;
+            private MecanumDrive drive = chassis.getMecanumDrive();
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if(firstRun) {
+                    firstRun = false;
+                    timeOut.reset();
+                }
+
+                double currentHeading = drive.localizer.getPose().heading.toDouble();
+                double rotation = chassis.calcTargetLock(isRedAlliance, currentHeading);
+                drive.setDrivePowers(
+                        new PoseVelocity2d(
+                                new Vector2d(0,0),//No translation
+                                rotation
+                        )
+                );
+                return ((timeOut.seconds() < SubSystemConfigs.TARGET_LOCK_TIMEOUT) ||
+                        (false /* met angle criterion */));
             }
         };
     }
