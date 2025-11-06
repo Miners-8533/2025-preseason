@@ -487,7 +487,7 @@ public final class MecanumDrive {
                 new TrajectoryBuilderParams(
                         1e-6,
                         new ProfileParams(
-                                0.25, 0.0175, 1e-2
+                                0.25, 0.0175/2.0, 1e-2
                         )
                 ),
                 beginPose, 0.0,

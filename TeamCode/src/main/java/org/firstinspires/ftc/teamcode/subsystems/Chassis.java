@@ -22,7 +22,7 @@ public class Chassis {
     public static double kS = 0.05;
     private double gyroOffset;
     private double commandedHeaading;
-    private double targetHeading;
+    public double targetHeading;
     public double targetDist;
     public Chassis(HardwareMap hardwareMap, Pose2d initialPose) {
         drive = new MecanumDrive(hardwareMap, initialPose);

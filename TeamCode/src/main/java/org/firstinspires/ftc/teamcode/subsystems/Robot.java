@@ -243,8 +243,9 @@ public class Robot {
                                 rotation
                         )
                 );
+                double headingError = chassis.targetHeading - currentHeading;
                 return ((timeOut.seconds() < SubSystemConfigs.TARGET_LOCK_TIMEOUT) ||
-                        (false /* met angle criterion */));
+                        (headingError < Math.toRadians(SubSystemConfigs.HEADING_THRESHOLD)));
             }
         };
     }

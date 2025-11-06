@@ -15,5 +15,6 @@ public class SubSystemConfigs {
     public static final double TRANSPORT_MAX = 1.0;
     public static final double TRANSPORT_BACKOUT_TIME = 0.2;
     public static final double TARGET_LOCK_TIMEOUT = 1.0;
+    public static final double HEADING_THRESHOLD = 0.5;//degrees
 
 }
