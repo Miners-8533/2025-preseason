@@ -35,6 +35,7 @@ public class Chassis {
             double forward,
             double strafe,
             double rotation,
+            double targetLockScrub,
             boolean isFieldOrientedControl,
             boolean isTargetLock,
             boolean isRedAlliance
@@ -46,7 +47,7 @@ public class Chassis {
         //Controller for target heading lock
         if(isTargetLock && !isFieldOrientedControl) {
             //override driver rotation command with target lock controller
-            rotation = calcTargetLock(isRedAlliance, heading);
+            rotation = calcTargetLock(isRedAlliance, heading, targetLockScrub);
         }
 
         if (isFieldOrientedControl) {
@@ -73,7 +74,7 @@ public class Chassis {
         );
     }
 
-    public double calcTargetLock(boolean isRedAlliance, double currentHeading) {
+    public double calcTargetLock(boolean isRedAlliance, double currentHeading, double targetLockScrub) {
         Vector2d robotPose = drive.localizer.getPose().position;
         Vector2d targetPos;
         if (isRedAlliance) {
@@ -84,9 +85,10 @@ public class Chassis {
             targetDist = SubSystemConfigs.BLUE_TARGET.minus(robotPose).norm();
         }
         targetHeading = (Math.atan2(targetPos.y, targetPos.x) + Math.PI);
-        if(targetHeading > Math.PI) {targetHeading -= 2*Math.PI;}
+        targetHeading += targetLockScrub;
+        if(targetHeading >  Math.PI) {targetHeading -= 2*Math.PI;}
+        if(targetHeading < -Math.PI) {targetHeading += 2*Math.PI;}
         headingController.targetValue = targetHeading;
-        //TODO insert scrub here
 
         return headingController.update(currentHeading);
     }

@@ -46,12 +46,11 @@ public class FeedForwardController {
             return Math.min(Math.max(output, -1.0), 1.0);
         }
     }
-
     private double normalizeAngle(double input) {
         while(input > Math.PI) {
             input -= 2*Math.PI;
         }
-        while(input < Math.PI) {
+        while(input < -Math.PI) {
             input += 2*Math.PI;
         }
         return input;

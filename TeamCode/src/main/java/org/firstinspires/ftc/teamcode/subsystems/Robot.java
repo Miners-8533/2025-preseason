@@ -144,6 +144,7 @@ public class Robot {
                 desiredForward,
                 desiredStrafe,
                 desiredRotation,
+                driveStation.targetLockScrub,
                 driveStation.isFieldOriented,
                 driveStation.isTargetLocked,
                 PoseStorage.isRedAllicance
