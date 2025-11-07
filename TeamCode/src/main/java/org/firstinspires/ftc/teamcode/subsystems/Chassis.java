@@ -36,31 +36,25 @@ public class Chassis {
             double strafe,
             double rotation,
             boolean isFieldOrientedControl,
-            boolean isGyroReset,
             boolean isTargetLock,
             boolean isRedAlliance
     ) {
         drive.updatePoseEstimate();
         Vector2d commanded_translation;
         double heading = drive.localizer.getPose().heading.toDouble();
-        if (isGyroReset){
-            gyroOffset = heading;
-        }
-        heading = heading - gyroOffset;
 
         //Controller for target heading lock
-        if(isTargetLock) {
+        if(isTargetLock && !isFieldOrientedControl) {
             //override driver rotation command with target lock controller
             rotation = calcTargetLock(isRedAlliance, heading);
         }
 
         if (isFieldOrientedControl) {
-//            if(isRedAlliance) {
-//                heading = heading - Math.PI/2;
-//            } else {
-//                heading = heading + Math.PI/2;
-//            }
-            heading = heading + Math.PI/2;
+            if(isRedAlliance) {
+                heading = heading - Math.PI/2;
+            } else {
+                heading = heading + Math.PI/2;
+            }
             if(heading < -Math.PI) {heading += 2*Math.PI;}
             if(heading >  Math.PI) {heading -= 2*Math.PI;}
             commanded_translation = rotate(forward, strafe, heading);

@@ -11,7 +11,6 @@ public class DriveStation {
     public double strafe;
     public double rotation;
     public boolean lastAcquire;
-    public boolean isGyroReset;
     public boolean isFieldOriented = true;
     public boolean isTargetLocked = false;
     public boolean isRedAlliance;
@@ -34,15 +33,13 @@ public class DriveStation {
         strafe = -driver.left_stick_x;
         rotation = -driver.right_stick_x / 2.0;
 
-        //TODO do we leave this in or force move to robot oriented control?
-        isGyroReset = driver.back;
         //Manual override for loss of gyro
         if(driver.startWasPressed()) {isFieldOriented = !isFieldOriented;}
 
-        //TODO for debug should be sourced from auton
-        if(driver.xWasPressed()) {
-            isRedAlliance = !isRedAlliance;
-        }
+//        //TODO for debug should be sourced from auton
+//        if(driver.xWasPressed()) {
+//            isRedAlliance = !isRedAlliance;
+//        }
 
         //Target lock
         isTargetLocked = operator.a;

@@ -124,7 +124,11 @@ public class Robot {
         }
 
         // State independent
-        launcher.setDistance(chassis.targetDist);
+        if(driveStation.isFieldOriented) {
+            launcher.setDistance(chassis.targetDist);
+        } else {
+            launcher.setDistance(70.0);// on line near point of triangle
+        }
 
         // State independent overrides
         if(driveStation.isOuttaking) {
@@ -140,8 +144,7 @@ public class Robot {
                 desiredForward,
                 desiredStrafe,
                 desiredRotation,
-                true,
-                driveStation.isGyroReset,
+                driveStation.isFieldOriented,
                 driveStation.isTargetLocked,
                 PoseStorage.isRedAllicance
         );
