@@ -80,20 +80,19 @@ public class Chassis {
     }
 
     public double calcTargetLock(boolean isRedAlliance, double currentHeading) {
-        Vector2d BLUE_TARGET = new Vector2d(-64,-60);
-        Vector2d RED_TARGET = new Vector2d(-64,64);
         Vector2d robotPose = drive.localizer.getPose().position;
         Vector2d targetPos;
         if (isRedAlliance) {
-            targetPos = robotPose.minus(RED_TARGET);
-            targetDist = RED_TARGET.minus(robotPose).norm();
+            targetPos = robotPose.minus(SubSystemConfigs.RED_TARGET);
+            targetDist = SubSystemConfigs.RED_TARGET.minus(robotPose).norm();
         } else {
-            targetPos = robotPose.minus(BLUE_TARGET);
-            targetDist = BLUE_TARGET.minus(robotPose).norm();
+            targetPos = robotPose.minus(SubSystemConfigs.BLUE_TARGET);
+            targetDist = SubSystemConfigs.BLUE_TARGET.minus(robotPose).norm();
         }
         targetHeading = (Math.atan2(targetPos.y, targetPos.x) + Math.PI);
         if(targetHeading > Math.PI) {targetHeading -= 2*Math.PI;}
         headingController.targetValue = targetHeading;
+        //TODO insert scrub here
 
         return headingController.update(currentHeading);
     }

@@ -20,7 +20,10 @@ public class FeedForwardController {
     }
     public double update(double measuredValue) {
         double currentTime = timer.nanoseconds();
+        measuredValue = normalizeAngle(measuredValue);
         double error = targetValue - measuredValue;
+        error = normalizeAngle(error);
+
         if(lastTime == Double.NaN) {
             lastError = error;
             lastTime = currentTime;
@@ -42,5 +45,15 @@ public class FeedForwardController {
             output = (Math.abs(output) < 0.01) ? (0.0) : (output + Math.signum(output) * kStiction);
             return Math.min(Math.max(output, -1.0), 1.0);
         }
+    }
+
+    private double normalizeAngle(double input) {
+        while(input > Math.PI) {
+            input -= 2*Math.PI;
+        }
+        while(input < Math.PI) {
+            input += 2*Math.PI;
+        }
+        return input;
     }
 }
