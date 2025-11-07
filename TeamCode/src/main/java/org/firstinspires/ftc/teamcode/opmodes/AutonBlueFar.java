@@ -1,12 +1,9 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.ProfileAccelConstraint;
 import com.acmerobotics.roadrunner.SequentialAction;
-import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
@@ -14,14 +11,16 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
+import org.firstinspires.ftc.teamcode.subsystems.PoseStorage;
 import org.firstinspires.ftc.teamcode.subsystems.Robot;
 
-@Autonomous(name="Testing", group="Competition")
-public class AutonTesting extends LinearOpMode {
+@Autonomous(name="Blue Far", group="Competition")
+public class AutonBlueFar extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        boolean isFlipped = true;
+        boolean isFlipped = false;
+        PoseStorage.isRedAllicance = false;
 
         Pose2d initialPose          = mirrorPose(new Pose2d(64.5,-17.5, Math.toRadians(180 )), isFlipped);
         Pose2d pickLoadingZoneStart = mirrorPose(new Pose2d(40.0,-65.0, Math.toRadians(0   )), isFlipped);

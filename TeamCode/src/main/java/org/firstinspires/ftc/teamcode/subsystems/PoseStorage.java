@@ -4,4 +4,5 @@ import com.acmerobotics.roadrunner.Pose2d;
 
 public class PoseStorage {
     public static Pose2d poseStorage = new Pose2d(0,0,Math.toRadians(0));
+    public static boolean isRedAllicance = false;
 }

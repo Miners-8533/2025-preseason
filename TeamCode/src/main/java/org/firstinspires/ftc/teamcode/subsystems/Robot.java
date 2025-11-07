@@ -32,7 +32,7 @@ public class Robot {
         TARGET_LOCK,
         LAUNCHING
     }
-        public Robot(HardwareMap hardwareMap, Gamepad driverController, Gamepad operatorController, Pose2d initialPose) {
+    public Robot(HardwareMap hardwareMap, Gamepad driverController, Gamepad operatorController, Pose2d initialPose) {
         chassis = new Chassis(hardwareMap, initialPose);
         driveStation = new DriveStation(driverController, operatorController);
         launcher = new Launcher(hardwareMap);
@@ -124,8 +124,7 @@ public class Robot {
         }
 
         // State independent
-        //TODO need to set distance of Launcher for angle/speed targets
-        //launcher.setDistance(chassis.targetDist);
+        launcher.setDistance(chassis.targetDist);
 
         // State independent overrides
         if(driveStation.isOuttaking) {
@@ -144,7 +143,7 @@ public class Robot {
                 true,
                 driveStation.isGyroReset,
                 driveStation.isTargetLocked,
-                driveStation.isRedAlliance
+                PoseStorage.isRedAllicance
         );
 
         //All logs grouped together

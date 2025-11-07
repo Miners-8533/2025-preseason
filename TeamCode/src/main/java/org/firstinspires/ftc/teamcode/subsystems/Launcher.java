@@ -10,7 +10,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
-
 @Config
 public class Launcher {
     private DcMotorEx fly_motor;
@@ -24,9 +23,16 @@ public class Launcher {
     public boolean isSetForSpin = false;
     private final double[][] launchMap = {
             //Distance (in) , effort (ticks/second), angle (servo position [0,1.0]
-            {0.0, 740.0, 0.57},//first point needs min values
-            {120.0, 740.0, 0.57},
-            {200.0, 740.0, 0.57}//last point needs max values
+            {0.0,   460.0, 0.66},//first point needs min values
+            {25.0,  460.0, 0.66},
+            {35.0,  500.0, 0.62},
+            {60.0,  560.0, 0.61},
+            {87.0,  640.0, 0.59},
+            {105.0, 700.0, 0.57},
+            {120.0, 720.0, 0.565},
+            {130.0, 740.0, 0.565},
+            {150.0, 820.0, 0.56},
+            {200.0, 820.0, 0.56}//last point needs max values
     };
     public Launcher(HardwareMap hardwareMap) {
         fly_motor = hardwareMap.get(DcMotorEx.class, "fly_motor_enc");
@@ -50,7 +56,7 @@ public class Launcher {
     public void setDistance(double distance) {
         //find nearest points
         int i = 1;
-        while((i < launchMap.length) && (distance < launchMap[i][0])) {
+        while(i < (launchMap.length-1) && (distance >= launchMap[i][0])) {
             i++;
         }
 
@@ -126,6 +132,8 @@ public class Launcher {
         tele.addData("Follow motor current (mA)",            fly_follow.getCurrent(CurrentUnit.MILLIAMPS));
         tele.addData("Fly motor power (+/-%FS)",            fly_motor.getPower());
         tele.addData("Follow motor power (+/-%FS)",         fly_follow.getPower());
+        tele.addData("Target Velocity: ", targetVelocity);
+        tele.addData("Hood target: ", hoodTarget);
     }
 
     public void autonLog(TelemetryPacket packet) {

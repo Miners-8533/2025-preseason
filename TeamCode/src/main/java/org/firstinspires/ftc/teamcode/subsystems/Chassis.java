@@ -80,7 +80,7 @@ public class Chassis {
     }
 
     public double calcTargetLock(boolean isRedAlliance, double currentHeading) {
-        Vector2d BLUE_TARGET = new Vector2d(-64,-56);
+        Vector2d BLUE_TARGET = new Vector2d(-64,-60);
         Vector2d RED_TARGET = new Vector2d(-64,64);
         Vector2d robotPose = drive.localizer.getPose().position;
         Vector2d targetPos;
