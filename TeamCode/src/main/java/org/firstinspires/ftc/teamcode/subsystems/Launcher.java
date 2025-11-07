@@ -21,6 +21,8 @@ public class Launcher {
     public double stopTarget = SubSystemConfigs.STOP_LOCK;
     public boolean isFirstLaunch = false;
     public boolean isSetForSpin = false;
+    private boolean wasAutoGood = false;
+    public int autoBallCount = 0;
     private final double[][] launchMap = {
             //Distance (in) , effort (ticks/second), angle (servo position [0,1.0]
             {0.0,   460.0, 0.66},//first point needs min values
@@ -108,6 +110,13 @@ public class Launcher {
             threshold *= 0.95;
         }
         boolean isThresholdMet = velocity > threshold;
+
+        //if we were good and now see a significant dip there was a launch
+        if(wasAutoGood && (velocity < targetVelocity*0.8)) {
+            autoBallCount++;
+        }
+        wasAutoGood = (velocity > targetVelocity*0.9);
+
         if(isThresholdMet && isFirstLaunch) {
             isFirstLaunch = false;
         }

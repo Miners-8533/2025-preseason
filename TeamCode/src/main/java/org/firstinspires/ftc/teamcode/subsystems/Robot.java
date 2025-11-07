@@ -193,6 +193,7 @@ public class Robot {
                 if(firstRun) {
                     firstRun = false;
                     launcher.isFirstLaunch = true;
+                    launcher.autoBallCount = 0;
                     launcher.stopTarget = SubSystemConfigs.STOP_OPEN;
                     launcher.isSetForSpin = true;
                     launcher.autonSet(0.57, 760.0);
@@ -205,7 +206,8 @@ public class Robot {
                 } else {
                     intake.transportPower = SubSystemConfigs.TRANSPORT_STOP;
                 }
-                return timeOut.seconds() < target;
+                boolean notDone = (timeOut.seconds() < target) && (launcher.autoBallCount < 3);
+                return notDone;
             }
         };
     }
