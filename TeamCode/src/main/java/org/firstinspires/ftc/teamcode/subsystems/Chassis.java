@@ -45,7 +45,7 @@ public class Chassis {
         double heading = drive.localizer.getPose().heading.toDouble();
 
         //Controller for target heading lock
-        if(isTargetLock && !isFieldOrientedControl) {
+        if(isTargetLock && isFieldOrientedControl) {
             //override driver rotation command with target lock controller
             rotation = calcTargetLock(isRedAlliance, heading, targetLockScrub);
         }

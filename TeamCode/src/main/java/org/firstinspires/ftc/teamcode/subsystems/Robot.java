@@ -88,7 +88,7 @@ public class Robot {
                 }
                 break;
             case TARGET_LOCK_PREP:
-                intake.intakePower = SubSystemConfigs.INTAKE_STOP;
+                intake.intakePower = SubSystemConfigs.INTAKE_RUN;
                 intake.transportPower = SubSystemConfigs.TRANSPORT_STOP;
                 launcher.stopTarget = SubSystemConfigs.STOP_OPEN;
                 launcher.isSetForSpin = true;
@@ -180,7 +180,6 @@ public class Robot {
             public boolean run(@NonNull TelemetryPacket packet) {
                 launcher.stopTarget = SubSystemConfigs.STOP_OPEN;
                 launcher.isSetForSpin = true;
-                launcher.autonSet(0.57, 760.0);
                 intake.intakePower = SubSystemConfigs.INTAKE_STOP;
                 intake.transportPower = SubSystemConfigs.TRANSPORT_STOP;
                 return false;
@@ -200,7 +199,6 @@ public class Robot {
                     launcher.autoBallCount = 0;
                     launcher.stopTarget = SubSystemConfigs.STOP_OPEN;
                     launcher.isSetForSpin = true;
-                    launcher.autonSet(0.57, 760.0);
                     intake.intakePower = SubSystemConfigs.INTAKE_MAX;
                     target = timeOut.seconds() + 2.25;
                 }
@@ -215,15 +213,33 @@ public class Robot {
             }
         };
     }
+
     public Action runIntake(){
         return new Action(){
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 launcher.stopTarget = SubSystemConfigs.STOP_LOCK;
                 launcher.isSetForSpin = false;
-                launcher.autonSet(0.58, 0.0);
                 intake.intakePower = SubSystemConfigs.INTAKE_MAX;
                 intake.transportPower = SubSystemConfigs.INTAKE_MAX;
+                return false;
+            }
+        };
+    }
+    public Action setLaunchFar(){
+        return new Action(){
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                launcher.autonSet(0.57, 740.0);
+                return false;
+            }
+        };
+    }
+    public Action setLaunchClose(){
+        return new Action(){
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                launcher.autonSet(0.61, 560.0);
                 return false;
             }
         };
@@ -241,7 +257,7 @@ public class Robot {
                 }
 
                 double currentHeading = drive.localizer.getPose().heading.toDouble();
-                double rotation = chassis.calcTargetLock(isRedAlliance, currentHeading);
+                double rotation = chassis.calcTargetLock(isRedAlliance, currentHeading, 0.0);
                 drive.setDrivePowers(
                         new PoseVelocity2d(
                                 new Vector2d(0,0),//No translation

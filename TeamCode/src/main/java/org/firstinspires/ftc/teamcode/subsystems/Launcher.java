@@ -23,6 +23,7 @@ public class Launcher {
     public boolean isSetForSpin = false;
     private boolean wasAutoGood = false;
     public int autoBallCount = 0;
+    public static double feedForwardCorrection = 0.5;
     private final double[][] launchMap = {
             //Distance (in) , effort (ticks/second), angle (servo position [0,1.0]
             {0.0,   460.0, 0.66},//first point needs min values
@@ -124,13 +125,17 @@ public class Launcher {
     }
 
     public void update() {
-            if ((fly_motor.getVelocity() > targetVelocity) || (targetVelocity == 0.0) || !isSetForSpin) {
-                fly_motor.setPower(0.0);
-                fly_follow.setPower(0.0);
-            } else {
-                fly_motor.setPower(1.0);
-                fly_follow.setPower(1.0);
-            }
+        if ((targetVelocity == 0.0) || !isSetForSpin) {
+            fly_motor.setPower(0.0);
+            fly_follow.setPower(0.0);
+        } else if (fly_motor.getVelocity() > targetVelocity) {
+            double feedforward = targetVelocity * 0.000417 * feedForwardCorrection;
+            fly_motor.setPower(feedforward);
+            fly_follow.setPower(feedforward);
+        } else {
+            fly_motor.setPower(1.0);
+            fly_follow.setPower(1.0);
+        }
 
         hood.setPosition(hoodTarget);
         stop.setPosition(stopTarget);
@@ -149,6 +154,11 @@ public class Launcher {
         packet.put("Velocity Measured: ", fly_motor.getVelocity());
         packet.put("Velocity Target: ", targetVelocity);
         packet.put("isVelocityGood", isVelocityGood());
+    }
+
+    public void testingPower() {
+        //fly_motor.setPower(testPow);
+        //fly_follow.setPower(testPow);
     }
 
 }

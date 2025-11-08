@@ -14,13 +14,13 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystems.PoseStorage;
 import org.firstinspires.ftc.teamcode.subsystems.Robot;
 
-@Autonomous(name="Blue Close", group="Competition")
-public class AutonBlueClose extends LinearOpMode {
+@Autonomous(name="Red Close", group="Competition")
+public class AutonRedClose extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        boolean isFlipped = false;
-        PoseStorage.isRedAllicance = false;
+        boolean isFlipped = true;
+        PoseStorage.isRedAllicance = true;
 
         Pose2d initialPose        = mirrorPose(new Pose2d(-55.0,-46.0, Math.toRadians(-135)), isFlipped);
         Pose2d pickGateGroupStart = mirrorPose(new Pose2d( 10.0,-25.0, Math.toRadians(-90 )), isFlipped);
