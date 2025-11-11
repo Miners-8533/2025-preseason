@@ -72,9 +72,9 @@ public class AutonRedFar extends LinearOpMode {
             robot.launch(),
             robot.runIntake(),
             tab4.build(),
-            robot.readyLaunch(),
+            //robot.readyLaunch(), Hydra
             tab5.build(),
-            robot.launch(),
+            //robot.launch(), Hyrda
             tab6.build()
         )));
     }

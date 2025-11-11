@@ -72,9 +72,9 @@ public class AutonRedClose extends LinearOpMode {
             robot.launch(),
             robot.runIntake(),
             tab4.build(),
-            robot.readyLaunch(),
+            //robot.readyLaunch(),
             tab5.build(),
-            robot.launch(),
+            //robot.launch(),
             tab6.build()
         )));
     }
