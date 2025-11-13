@@ -10,6 +10,11 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 @Config
 public class Launcher {
     private DcMotorEx fly_motor;
@@ -24,6 +29,7 @@ public class Launcher {
     private boolean wasAutoGood = false;
     public int autoBallCount = 0;
     public static double feedForwardCorrection = 0.5;
+    private MovingAverage filtered = new MovingAverage(5);
     private final double[][] launchMap = {
             //Distance (in) , effort (ticks/second), angle (servo position [0,1.0]
             {0.0,   460.0, 0.66},//first point needs min values
@@ -125,10 +131,12 @@ public class Launcher {
     }
 
     public void update() {
+        double curVel = fly_motor.getVelocity();
+        double filteredVel = filtered.next(curVel);
         if ((targetVelocity == 0.0) || !isSetForSpin) {
             fly_motor.setPower(0.0);
             fly_follow.setPower(0.0);
-        } else if (fly_motor.getVelocity() > targetVelocity) {
+        } else if (curVel > targetVelocity) {
             double feedforward = targetVelocity * 0.000417 * feedForwardCorrection;
             fly_motor.setPower(feedforward);
             fly_follow.setPower(feedforward);
@@ -142,8 +150,9 @@ public class Launcher {
     }
     public void log(Telemetry tele) {
         tele.addData("Fly motor encoder ticks per second",  fly_motor.getVelocity());
-        tele.addData("Fly motor current (mA)",               fly_motor.getCurrent(CurrentUnit.MILLIAMPS));
-        tele.addData("Follow motor current (mA)",            fly_follow.getCurrent(CurrentUnit.MILLIAMPS));
+        tele.addData("Filtered velocity ticks per second",  filtered.peek());
+        tele.addData("Fly motor current (mA)",              fly_motor.getCurrent(CurrentUnit.MILLIAMPS));
+        tele.addData("Follow motor current (mA)",           fly_follow.getCurrent(CurrentUnit.MILLIAMPS));
         tele.addData("Fly motor power (+/-%FS)",            fly_motor.getPower());
         tele.addData("Follow motor power (+/-%FS)",         fly_follow.getPower());
         tele.addData("Target Velocity: ", targetVelocity);
@@ -156,9 +165,20 @@ public class Launcher {
         packet.put("isVelocityGood", isVelocityGood());
     }
 
-    public void testingPower() {
-        //fly_motor.setPower(testPow);
-        //fly_follow.setPower(testPow);
+    private class MovingAverage {
+        private final List<Double> window;
+        private double sum = 0.0;
+        public MovingAverage(int windowSize) {
+            window = new ArrayList<>(Collections.nCopies(windowSize, 0.0));
+        }
+        public double next(double value) {
+            sum += value;
+            sum -= window.remove(0);
+            window.add(value);
+            return peek();
+        }
+        public double peek() {
+            return sum / window.size();
+        }
     }
-
 }
