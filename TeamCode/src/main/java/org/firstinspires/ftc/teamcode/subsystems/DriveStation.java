@@ -26,7 +26,7 @@ public class DriveStation {
         rotation = -driver.right_stick_x / 2.0;
 
         //Manual override for loss of gyro
-        if(driver.startWasPressed()) {isFieldOriented = !isFieldOriented;}
+        if(driver.backWasPressed()) {isFieldOriented = !isFieldOriented;}
 
         if(driver.dpadUpWasPressed())    {targetLockScrub = 0.0;           }//Reset scrub
         double dirFix = (PoseStorage.isRedAllicance) ? 1.0 : -1.0;

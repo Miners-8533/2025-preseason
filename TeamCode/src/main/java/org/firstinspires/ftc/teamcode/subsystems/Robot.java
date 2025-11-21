@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import androidx.annotation.NonNull;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
@@ -14,6 +15,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 
+@Config
 public class Robot {
     private Chassis chassis;
     private Launcher launcher;
@@ -23,6 +25,7 @@ public class Robot {
     private boolean isRedAlliance;
     private RobotState robotState;
     private ElapsedTime time;
+    public static double stopTarget = 0.5;
     private enum RobotState {
         READY,
         INTAKE_PREP,
@@ -99,6 +102,7 @@ public class Robot {
                 break;
             case TARGET_LOCK:
                 if (driveStation.isLaunching) {
+                    launcher.stopTarget = SubSystemConfigs.STOP_OPEN;
                     //run intake while shooting to make sure artifacts move through transport
                     intake.intakePower = SubSystemConfigs.INTAKE_MAX;
                     if (launcher.isVelocityGood()) {
@@ -180,7 +184,7 @@ public class Robot {
             public boolean run(@NonNull TelemetryPacket packet) {
                 launcher.stopTarget = SubSystemConfigs.STOP_OPEN;
                 launcher.isSetForSpin = true;
-                intake.intakePower = SubSystemConfigs.INTAKE_STOP;
+                intake.intakePower = SubSystemConfigs.INTAKE_RUN;
                 intake.transportPower = SubSystemConfigs.TRANSPORT_STOP;
                 return false;
             }
@@ -199,16 +203,74 @@ public class Robot {
                     launcher.autoBallCount = 0;
                     launcher.stopTarget = SubSystemConfigs.STOP_OPEN;
                     launcher.isSetForSpin = true;
-                    intake.intakePower = SubSystemConfigs.INTAKE_MAX;
-                    target = timeOut.seconds() + 2.25;
+                    intake.intakePower = SubSystemConfigs.INTAKE_RUN;
+                    target = timeOut.seconds() + 2.5;
                 }
                 launcher.autonLog(packet);
                 if(launcher.isVelocityGoodAuton()) {
-                    intake.transportPower = SubSystemConfigs.TRANSPORT_MAX;
+                    intake.transportPower = 0.5;
                 } else {
                     intake.transportPower = SubSystemConfigs.TRANSPORT_STOP;
                 }
                 boolean notDone = (timeOut.seconds() < target) && (launcher.autoBallCount < 3);
+                return notDone;
+            }
+        };
+    }
+    public Action launchLong(){
+        return new Action(){
+            private boolean firstRun = true;
+            private ElapsedTime timeOut = new ElapsedTime();
+            private double target = Double.MAX_VALUE;
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if(firstRun) {
+                    firstRun = false;
+                    launcher.isFirstLaunch = true;
+                    launcher.autoBallCount = 0;
+                    launcher.stopTarget = SubSystemConfigs.STOP_OPEN;
+                    launcher.isSetForSpin = true;
+                    intake.intakePower = SubSystemConfigs.INTAKE_RUN;
+                    target = timeOut.seconds() + 3.0;
+                }
+                launcher.autonLog(packet);
+                if(launcher.isVelocityGoodAuton()) {
+                    intake.transportPower = 0.5;
+                } else {
+                    intake.transportPower = SubSystemConfigs.TRANSPORT_STOP;
+                }
+                boolean notDone = (timeOut.seconds() < target);
+                return notDone;
+            }
+        };
+    }
+
+    public Action juggle(){
+        return new Action(){
+            private boolean firstRun = true;
+            private ElapsedTime timeOut = new ElapsedTime();
+            private double target = Double.MAX_VALUE;
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if(firstRun) {
+                    firstRun = false;
+                    launcher.isFirstLaunch = true;
+                    launcher.autoBallCount = 0;
+                    launcher.stopTarget = SubSystemConfigs.STOP_OPEN;
+                    launcher.isSetForSpin = true;
+                    intake.intakePower = SubSystemConfigs.INTAKE_RUN;
+                    target = timeOut.seconds() + 2.25;
+                }
+                launcher.autonLog(packet);
+                if(launcher.isVelocityGoodAuton()) {
+                    intake.transportPower = SubSystemConfigs.TRANSPORT_INTAKE;
+                } else {
+                    intake.transportPower = SubSystemConfigs.TRANSPORT_STOP;
+                }
+                boolean notDone = (timeOut.seconds() < target) && (launcher.autoBallCount < 1);
+                if(!notDone) {
+                    intake.transportPower = SubSystemConfigs.TRANSPORT_STOP;
+                }
                 return notDone;
             }
         };
@@ -220,9 +282,32 @@ public class Robot {
             public boolean run(@NonNull TelemetryPacket packet) {
                 launcher.stopTarget = SubSystemConfigs.STOP_LOCK;
                 launcher.isSetForSpin = false;
-                intake.intakePower = SubSystemConfigs.INTAKE_MAX;
-                intake.transportPower = SubSystemConfigs.INTAKE_MAX;
+                intake.intakePower = SubSystemConfigs.INTAKE_RUN;
+                intake.transportPower = SubSystemConfigs.TRANSPORT_INTAKE;
                 return false;
+            }
+        };
+    }
+    public Action backoutIntake(){
+        return new Action(){
+            private boolean firstRun = true;
+            private ElapsedTime timeOut = new ElapsedTime();
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if(firstRun) {
+                    firstRun = false;
+                    launcher.stopTarget = SubSystemConfigs.STOP_LOCK;
+                    launcher.isSetForSpin = false;
+                    intake.intakePower = SubSystemConfigs.INTAKE_RUN;
+                    intake.transportPower = SubSystemConfigs.TRANSPORT_BACKOUT;
+                    timeOut.reset();
+                }
+                boolean notDone = (timeOut.seconds() < SubSystemConfigs.TRANSPORT_BACKOUT_TIME);
+                if(!notDone) {
+                    intake.transportPower = SubSystemConfigs.TRANSPORT_STOP;
+                    intake.intakePower = SubSystemConfigs.INTAKE_STOP;
+                }
+                return notDone;
             }
         };
     }
@@ -239,7 +324,16 @@ public class Robot {
         return new Action(){
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                launcher.autonSet(0.61, 560.0);
+                launcher.autonSet(0.595, 560.0);
+                return false;
+            }
+        };
+    }
+    public Action setJuggle(){
+        return new Action(){
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                launcher.autonSet(0.57, 260.0);//Use 240 for corner
                 return false;
             }
         };

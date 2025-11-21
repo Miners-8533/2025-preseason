@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
@@ -23,16 +24,20 @@ public class Launcher {
     private Servo hood;
     private Servo stop;
     public static double hoodTarget = SubSystemConfigs.HOOD_MAX;
-    public double stopTarget = SubSystemConfigs.STOP_LOCK;
+    public static double stopTarget = SubSystemConfigs.STOP_LOCK;
     public boolean isFirstLaunch = false;
     public boolean isSetForSpin = false;
     private boolean wasAutoGood = false;
     public int autoBallCount = 0;
     public static double feedForwardCorrection = 0.5;
+    private ElapsedTime time = new ElapsedTime();
+    private double prevTime = 0.0;
+    private double loopTime = 0.0;
     private MovingAverage filtered = new MovingAverage(5);
     private final double[][] launchMap = {
             //Distance (in) , effort (ticks/second), angle (servo position [0,1.0]
-            {0.0,   460.0, 0.66},//first point needs min values
+            {0.0,   440.0, 0.67},//first point needs min values
+            {15.0,  440.0, 0.67},
             {25.0,  460.0, 0.66},
             {35.0,  500.0, 0.62},
             {60.0,  560.0, 0.61},
@@ -60,6 +65,8 @@ public class Launcher {
         fly_follow.setMotorEnable();
         fly_follow.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         fly_follow.setPower(0.0);
+
+        time.reset();
     }
 
     public void setDistance(double distance) {
@@ -95,7 +102,7 @@ public class Launcher {
     }
 
     public boolean isVelocityGood() {
-        double velocity = fly_motor.getVelocity();
+        double velocity = filtered.peek();//fly_motor.getVelocity();
         double threshold = targetVelocity;
         if(isFirstLaunch) {
             threshold *= 1.0;
@@ -109,7 +116,7 @@ public class Launcher {
         return isThresholdMet;
     }
     public boolean isVelocityGoodAuton() {
-        double velocity = fly_motor.getVelocity();
+        double velocity = fly_motor.getVelocity();//filtered.peek();
         double threshold = targetVelocity;
         if(isFirstLaunch) {
             threshold *= 1.0;
@@ -133,7 +140,11 @@ public class Launcher {
     public void update() {
         double curVel = fly_motor.getVelocity();
         double filteredVel = filtered.next(curVel);
-        if ((targetVelocity == 0.0) || !isSetForSpin) {
+        double curTime = time.milliseconds();
+        loopTime = curTime - prevTime;
+        prevTime = curTime;
+
+        if ((targetVelocity == 0.0) || !isSetForSpin) {//think of adding hysteresis
             fly_motor.setPower(0.0);
             fly_follow.setPower(0.0);
         } else if (curVel > targetVelocity) {
@@ -155,6 +166,7 @@ public class Launcher {
         tele.addData("Follow motor current (mA)",           fly_follow.getCurrent(CurrentUnit.MILLIAMPS));
         tele.addData("Fly motor power (+/-%FS)",            fly_motor.getPower());
         tele.addData("Follow motor power (+/-%FS)",         fly_follow.getPower());
+        tele.addData("Loop time (ms)", loopTime);
         tele.addData("Target Velocity: ", targetVelocity);
         tele.addData("Hood target: ", hoodTarget);
     }

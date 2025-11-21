@@ -8,13 +8,15 @@ import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystems.PoseStorage;
 import org.firstinspires.ftc.teamcode.subsystems.Robot;
 
-@Autonomous(name="Blue Far", group="Competition")
+@Disabled
+@Autonomous(name="Blue Far Old", group="Competition")
 public class AutonBlueFar extends LinearOpMode {
 
     @Override
@@ -60,10 +62,8 @@ public class AutonBlueFar extends LinearOpMode {
 
         Actions.runBlocking(new ParallelAction(robot.autonUpdate(), new SequentialAction(
             robot.setLaunchFar(),
-            new ParallelAction(
-                robot.readyLaunch(),
-                tab1.build()
-            ),
+            robot.readyLaunch(),
+            tab1.build(),
             robot.launch(),
             robot.runIntake(),
             tab2.build(),

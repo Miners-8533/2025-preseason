@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.subsystems.PoseStorage;
 import org.firstinspires.ftc.teamcode.subsystems.Robot;
 import org.firstinspires.ftc.teamcode.subsystems.SubSystemConfigs;
 
-//@Disabled
+@Disabled
 @TeleOp(name="TeleOp - Testing", group="Testing")
 public class TestingTeleOp extends LinearOpMode {
     @Override
@@ -27,18 +27,18 @@ public class TestingTeleOp extends LinearOpMode {
         Limelight limelight = new Limelight(hardwareMap);
 
         waitForStart();
-//        intake.intakePower = SubSystemConfigs.INTAKE_RUN;
-//        launcher.stopTarget = SubSystemConfigs.STOP_OPEN;
+        intake.intakePower = SubSystemConfigs.INTAKE_RUN;
+        launcher.stopTarget = SubSystemConfigs.STOP_OPEN;
         launcher.autoBallCount = 0;
-        //launcher.isSetForSpin = true;
+        launcher.isSetForSpin = true;
         while (opModeIsActive()) {
-//            if(launcher.isVelocityGoodAuton()) {
-//                intake.transportPower = SubSystemConfigs.TRANSPORT_INTAKE;
-//            } else {
-//                intake.transportPower = SubSystemConfigs.TRANSPORT_STOP;
-//            }
-//            launcher.update();
-//            intake.update();
+            if(launcher.isVelocityGoodAuton() && gamepad1.a) {
+                intake.transportPower = SubSystemConfigs.TRANSPORT_INTAKE;
+            } else {
+                intake.transportPower = SubSystemConfigs.TRANSPORT_STOP;
+            }
+            launcher.update();
+            intake.update();
             limelight.update();
             launcher.log(telemetry);
             intake.log(telemetry);
