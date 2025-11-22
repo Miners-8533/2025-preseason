@@ -37,6 +37,7 @@ public class AutonBlueCloseQual extends LinearOpMode {
         Pose2d gate                 = mirrorPose(new Pose2d(  -3.0,-60.0, Math.toRadians( 90 )), isFlipped);
         Pose2d gatePark             = mirrorPose(new Pose2d(  3.5,-40.0, Math.toRadians( 90 )), isFlipped);
         Pose2d park                 = mirrorPose(new Pose2d(36.0,-12.0, Math.toRadians(-135)), isFlipped);
+        Pose2d parkClose            = mirrorPose(new Pose2d(-11.0,-31.0, Math.toRadians(-132.5)), isFlipped);
         Pose2d juggle               = mirrorPose(new Pose2d(-52.0,-42.0, Math.toRadians(-130)), isFlipped);
         Pose2d limelight            = mirrorPose(new Pose2d(-44.0,-39.0, Math.toRadians( 135)), isFlipped);
 
@@ -81,7 +82,7 @@ public class AutonBlueCloseQual extends LinearOpMode {
         TrajectoryActionBuilder tab9 = drive.actionBuilder(closeScorePose)
                 //.turnTo(Math.toRadians(90), new TurnConstraints(6*Math.PI, -2*Math.PI,2*Math.PI))
                 .setReversed(true)
-                .splineToSplineHeading(gatePark, mirrorTangent(Math.toRadians(90), isFlipped), null, new ProfileAccelConstraint(-150,150));
+                .splineToConstantHeading(parkClose.position, mirrorTangent(Math.toRadians(-45), isFlipped), null, new ProfileAccelConstraint(-150,150));
 
         // Wait for the game to start (driver presses START)
         waitForStart();
