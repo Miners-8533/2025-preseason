@@ -28,6 +28,7 @@ public class Launcher {
     public boolean isFirstLaunch = false;
     public boolean isSetForSpin = false;
     private boolean wasAutoGood = false;
+    public boolean isHoodDown = false;
     public int autoBallCount = 0;
     public static double feedForwardCorrection = 0.5;
     private ElapsedTime time = new ElapsedTime();
@@ -156,7 +157,11 @@ public class Launcher {
             fly_follow.setPower(1.0);
         }
 
-        hood.setPosition(hoodTarget);
+        if(isHoodDown) {
+            hood.setPosition(SubSystemConfigs.HOOD_MIN);
+        } else {
+            hood.setPosition(hoodTarget);
+        }
         stop.setPosition(stopTarget);
     }
     public void log(Telemetry tele) {

@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class DriveStation {
     private Gamepad driver;
@@ -13,6 +12,7 @@ public class DriveStation {
     public boolean isTargetLocked = false;
     public boolean isLaunching = false;
     public boolean isOuttaking = false;
+    public boolean isHoodDown = false;
     public double targetLockScrub = 0.0;
     public DriveStation(Gamepad driverController, Gamepad operatorController) {
         driver = driverController;
@@ -32,6 +32,8 @@ public class DriveStation {
         double dirFix = (PoseStorage.isRedAllicance) ? 1.0 : -1.0;
         if(driver.dpadRightWasPressed()) {targetLockScrub += Math.PI/180.0 * dirFix;}
         if(driver.dpadLeftWasPressed())  {targetLockScrub -= Math.PI/180.0 * dirFix;}
+
+        if(driver.bWasPressed()) {isHoodDown = !isHoodDown;}
 
 //        //TODO for debug should be sourced from auton
 //        if(driver.xWasPressed()) {

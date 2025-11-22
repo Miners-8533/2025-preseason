@@ -139,6 +139,7 @@ public class Robot {
             intake.intakePower = SubSystemConfigs.INTAKE_OUTAKE;
             intake.transportPower = SubSystemConfigs.TRANSPORT_OUTAKE;
         }
+        launcher.isHoodDown = driveStation.isHoodDown;
 
         //All updates grouped together (except driveStation)
         launcher.update();
@@ -204,7 +205,7 @@ public class Robot {
                     launcher.stopTarget = SubSystemConfigs.STOP_OPEN;
                     launcher.isSetForSpin = true;
                     intake.intakePower = SubSystemConfigs.INTAKE_RUN;
-                    target = timeOut.seconds() + 2.5;
+                    target = timeOut.seconds() + 2.25;
                 }
                 launcher.autonLog(packet);
                 if(launcher.isVelocityGoodAuton()) {

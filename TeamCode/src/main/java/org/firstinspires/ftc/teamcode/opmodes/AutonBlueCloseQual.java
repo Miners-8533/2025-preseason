@@ -61,6 +61,7 @@ public class AutonBlueCloseQual extends LinearOpMode {
                 .splineToLinearHeading(closeScorePose, mirrorTangent(Math.toRadians(180), isFlipped), null, new ProfileAccelConstraint(-50,50));
 
         TrajectoryActionBuilder tab5 = drive.actionBuilder(closeScorePose)
+                .setReversed(true)
                 .splineToLinearHeading(pickGateGroupStart, mirrorTangent(Math.toRadians(270), isFlipped),null, new ProfileAccelConstraint(-50,50))
                 .splineToLinearHeading(pickGateGroupEnd, mirrorTangent(Math.toRadians(270), isFlipped),null, new ProfileAccelConstraint(-50,50));
 

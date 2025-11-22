@@ -29,14 +29,15 @@ public class TestingTeleOp extends LinearOpMode {
         waitForStart();
         intake.intakePower = SubSystemConfigs.INTAKE_RUN;
         launcher.stopTarget = SubSystemConfigs.STOP_OPEN;
+        intake.transportPower = SubSystemConfigs.TRANSPORT_STOP;
         launcher.autoBallCount = 0;
         launcher.isSetForSpin = true;
         while (opModeIsActive()) {
-            if(launcher.isVelocityGoodAuton() && gamepad1.a) {
-                intake.transportPower = SubSystemConfigs.TRANSPORT_INTAKE;
-            } else {
-                intake.transportPower = SubSystemConfigs.TRANSPORT_STOP;
-            }
+//            if(launcher.isVelocityGoodAuton() && gamepad1.a) {
+//                intake.transportPower = SubSystemConfigs.TRANSPORT_INTAKE;
+//            } else {
+//                intake.transportPower = SubSystemConfigs.TRANSPORT_STOP;
+//            }
             launcher.update();
             intake.update();
             limelight.update();

@@ -7,6 +7,7 @@ public class SubSystemConfigs {
     public static final double STOP_OPEN = 0.62;
     public static final double STOP_DELAY = 1.5;
     public static final double HOOD_MAX = 0.57;
+    public static final double HOOD_MIN = .7;
     public static final double INTAKE_STOP = 0.0;
     public static final double INTAKE_RUN = 1.0;
     public static final double INTAKE_MAX = 1.0;
