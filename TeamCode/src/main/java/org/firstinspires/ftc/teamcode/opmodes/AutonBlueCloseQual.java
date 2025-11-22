@@ -80,7 +80,7 @@ public class AutonBlueCloseQual extends LinearOpMode {
         TrajectoryActionBuilder tab9 = drive.actionBuilder(closeScorePose)
                 //.turnTo(Math.toRadians(90), new TurnConstraints(6*Math.PI, -2*Math.PI,2*Math.PI))
                 .setReversed(true)
-                .splineToSplineHeading(gatePark, mirrorTangent(Math.toRadians(90), isFlipped), null, new ProfileAccelConstraint(-50,50));
+                .splineToSplineHeading(gatePark, mirrorTangent(Math.toRadians(90), isFlipped), null, new ProfileAccelConstraint(-150,150));
 
         // Wait for the game to start (driver presses START)
         waitForStart();
@@ -93,7 +93,7 @@ public class AutonBlueCloseQual extends LinearOpMode {
             robot.runIntake(),
             tab2.build(),
             tab3.build(),
-            new SleepAction(0.5),
+            new SleepAction(0.1),
             robot.readyLaunch(),
             tab4.build(),
             robot.launch(),
