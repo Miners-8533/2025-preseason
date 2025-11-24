@@ -94,7 +94,7 @@ public class AutonBlueCloseQual extends LinearOpMode {
             robot.launch(),
             robot.runIntake(),
             tab2.build(),
-            new SleepAction(3.0),
+            new SleepAction(6.0),
             tab3.build(),
             new SleepAction(2.0),
             robot.readyLaunch(),
