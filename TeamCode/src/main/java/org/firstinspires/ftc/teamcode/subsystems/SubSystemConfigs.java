@@ -13,7 +13,7 @@ public class SubSystemConfigs {
     public static final double INTAKE_MAX = 1.0;
     public static final double INTAKE_OUTAKE = -0.5;
     public static final double TRANSPORT_STOP = 0.0;
-    public static final double TRANSPORT_INTAKE = 0.25;
+    public static final double TRANSPORT_INTAKE = 0.5;
     public static final double TRANSPORT_BACKOUT = -1.0;
     public static final double TRANSPORT_OUTAKE = -1.0;
     public static final double TRANSPORT_MAX = 1.0;

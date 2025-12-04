@@ -316,7 +316,7 @@ public class Robot {
         return new Action(){
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                launcher.autonSet(0.57, 740.0);
+                launcher.autonSet(0.57, 740.0*(3.0/2.2));
                 return false;
             }
         };
@@ -325,7 +325,7 @@ public class Robot {
         return new Action(){
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                launcher.autonSet(0.595, 560.0);
+                launcher.autonSet(0.595, 560.0*(3.0/2.2));
                 return false;
             }
         };

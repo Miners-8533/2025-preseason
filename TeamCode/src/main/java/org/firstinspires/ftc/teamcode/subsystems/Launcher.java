@@ -37,17 +37,17 @@ public class Launcher {
     private MovingAverage filtered = new MovingAverage(5);
     private final double[][] launchMap = {
             //Distance (in) , effort (ticks/second), angle (servo position [0,1.0]
-            {0.0,   440.0, 0.67},//first point needs min values
-            {15.0,  440.0, 0.67},
-            {25.0,  460.0, 0.66},
-            {35.0,  500.0, 0.62},
-            {60.0,  560.0, 0.61},
-            {87.0,  640.0, 0.59},
-            {105.0, 700.0, 0.57},
-            {120.0, 720.0, 0.565},
-            {130.0, 740.0, 0.565},
-            {150.0, 820.0, 0.56},
-            {200.0, 820.0, 0.56}//last point needs max values
+            {0.0,   440.0*(3.0/2.2), 0.67},//first point needs min values
+            {15.0,  440.0*(3.0/2.2), 0.67},
+            {25.0,  460.0*(3.0/2.2), 0.66},
+            {35.0,  500.0*(3.0/2.2), 0.62},
+            {60.0,  560.0*(3.0/2.2), 0.61},
+            {87.0,  640.0*(3.0/2.2), 0.59},
+            {105.0, 700.0*(3.0/2.2), 0.57},
+            {120.0, 730.0*(3.0/2.2), 0.565},
+            {130.0, 750.0*(3.0/2.2), 0.565},
+            {150.0, 820.0*(3.0/2.2), 0.56},
+            {200.0, 820.0*(3.0/2.2), 0.56}//last point needs max values
     };
     public Launcher(HardwareMap hardwareMap) {
         fly_motor = hardwareMap.get(DcMotorEx.class, "fly_motor_enc");
