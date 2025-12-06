@@ -41,13 +41,13 @@ public class Launcher {
             {15.0,  440.0*(3.0/2.2), 0.67},
             {25.0,  460.0*(3.0/2.2), 0.66},
             {35.0,  500.0*(3.0/2.2), 0.62},
-            {60.0,  560.0*(3.0/2.2), 0.61},
+            {60.0,  550.0*(3.0/2.2), 0.61},
             {87.0,  640.0*(3.0/2.2), 0.59},
             {105.0, 700.0*(3.0/2.2), 0.57},
             {120.0, 730.0*(3.0/2.2), 0.565},
             {130.0, 750.0*(3.0/2.2), 0.565},
-            {150.0, 820.0*(3.0/2.2), 0.56},
-            {200.0, 820.0*(3.0/2.2), 0.56}//last point needs max values
+            {150.0, 800.0*(3.0/2.2), 0.56},
+            {200.0, 800.0*(3.0/2.2), 0.56}//last point needs max values
     };
     public Launcher(HardwareMap hardwareMap) {
         fly_motor = hardwareMap.get(DcMotorEx.class, "fly_motor_enc");
@@ -127,7 +127,7 @@ public class Launcher {
         boolean isThresholdMet = velocity > threshold;
 
         //if we were good and now see a significant dip there was a launch
-        if(wasAutoGood && (velocity < targetVelocity*0.8)) {
+        if(wasAutoGood && (velocity < targetVelocity*0.85)) {
             autoBallCount++;
         }
         wasAutoGood = (velocity > targetVelocity*0.9);

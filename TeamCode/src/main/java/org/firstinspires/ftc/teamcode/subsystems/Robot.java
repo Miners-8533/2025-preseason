@@ -209,7 +209,7 @@ public class Robot {
                 }
                 launcher.autonLog(packet);
                 if(launcher.isVelocityGoodAuton()) {
-                    intake.transportPower = 0.5;
+                    intake.transportPower = SubSystemConfigs.TRANSPORT_INTAKE;
                 } else {
                     intake.transportPower = SubSystemConfigs.TRANSPORT_STOP;
                 }
@@ -236,11 +236,11 @@ public class Robot {
                 }
                 launcher.autonLog(packet);
                 if(launcher.isVelocityGoodAuton()) {
-                    intake.transportPower = 0.5;
+                    intake.transportPower = SubSystemConfigs.TRANSPORT_INTAKE;
                 } else {
                     intake.transportPower = SubSystemConfigs.TRANSPORT_STOP;
                 }
-                boolean notDone = (timeOut.seconds() < target);
+                boolean notDone = (timeOut.seconds() < target) && (launcher.autoBallCount < 3);
                 return notDone;
             }
         };
