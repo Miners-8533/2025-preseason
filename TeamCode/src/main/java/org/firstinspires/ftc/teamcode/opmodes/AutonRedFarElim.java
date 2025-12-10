@@ -10,20 +10,19 @@ import com.acmerobotics.roadrunner.TurnConstraints;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystems.PoseStorage;
 import org.firstinspires.ftc.teamcode.subsystems.Robot;
 
-@Autonomous(name="Blue Far Elim", group="Competition")
-public class AutonBlueFarElim extends LinearOpMode {
+@Autonomous(name="Red Far Elim", group="Competition")
+public class AutonRedFarElim extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        boolean isFlipped = false;
-        PoseStorage.isRedAllicance = false;
+        boolean isFlipped = true;
+        PoseStorage.isRedAllicance = true;
 
         Pose2d initialPose          = mirrorPose(new Pose2d(64.5,-17.5, Math.toRadians(180 )), isFlipped);
         Pose2d pickLoadingZoneStart = mirrorPose(new Pose2d(56.0,-60.0, Math.toRadians(-45 )), isFlipped);

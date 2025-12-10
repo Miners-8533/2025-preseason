@@ -37,10 +37,10 @@ public class Launcher {
     private MovingAverage filtered = new MovingAverage(5);
     private final double[][] launchMap = {
             //Distance (in) , effort (ticks/second), angle (servo position [0,1.0]
-            {0.0,   440.0*(3.0/2.2), 0.67},//first point needs min values
-            {15.0,  440.0*(3.0/2.2), 0.67},
-            {25.0,  460.0*(3.0/2.2), 0.66},
-            {35.0,  500.0*(3.0/2.2), 0.62},
+            {0.0,   440.0*(3.0/2.2), 0.68},//first point needs min values
+            {15.0,  440.0*(3.0/2.2), 0.68},
+            {25.0,  460.0*(3.0/2.2), 0.68},
+            {35.0,  500.0*(3.0/2.2), 0.64},
             {60.0,  550.0*(3.0/2.2), 0.61},
             {87.0,  640.0*(3.0/2.2), 0.59},
             {105.0, 700.0*(3.0/2.2), 0.57},

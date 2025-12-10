@@ -232,7 +232,7 @@ public class Robot {
                     launcher.stopTarget = SubSystemConfigs.STOP_OPEN;
                     launcher.isSetForSpin = true;
                     intake.intakePower = SubSystemConfigs.INTAKE_RUN;
-                    target = timeOut.seconds() + 3.0;
+                    target = timeOut.seconds() + 2.5;
                 }
                 launcher.autonLog(packet);
                 if(launcher.isVelocityGoodAuton()) {
@@ -312,11 +312,32 @@ public class Robot {
             }
         };
     }
+    public Action setNoIntake(){
+        return new Action(){
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                intake.intakePower = 0.0;
+                intake.transportPower = 0.0;
+                return false;
+            }
+        };
+    }
+    public Action setIntake(){
+        return new Action(){
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                intake.intakePower = SubSystemConfigs.INTAKE_RUN;
+                intake.transportPower = 0.0;
+                return false;
+            }
+        };
+    }
+
     public Action setLaunchFar(){
         return new Action(){
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                launcher.autonSet(0.57, 740.0*(3.0/2.2));
+                launcher.autonSet(0.56, 1020.0);
                 return false;
             }
         };
@@ -325,7 +346,7 @@ public class Robot {
         return new Action(){
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                launcher.autonSet(0.595, 560.0*(3.0/2.2));
+                launcher.autonSet(0.595, 760.0);
                 return false;
             }
         };
