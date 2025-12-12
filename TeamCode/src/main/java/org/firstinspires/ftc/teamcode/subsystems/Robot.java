@@ -67,7 +67,7 @@ public class Robot {
                 intake.transportPower = SubSystemConfigs.TRANSPORT_STOP;
                 launcher.stopTarget = SubSystemConfigs.STOP_LOCK;
                 robotState = RobotState.INTAKING;
-                launcher.isSetForSpin = false;
+                launcher.isSetForSpin = true;//NOTE CHANGE TO FALSE TO HAVE FLYWHEEL SPIN DOWN
                 time.reset();
                 break;
             case INTAKING:
@@ -106,13 +106,13 @@ public class Robot {
                     //run intake while shooting to make sure artifacts move through transport
                     intake.intakePower = SubSystemConfigs.INTAKE_MAX;
                     if (launcher.isVelocityGood()) {
-                        intake.transportPower = SubSystemConfigs.TRANSPORT_MAX;
+                        intake.transportPower = SubSystemConfigs.TRANSPORT_INTAKE;
                     } else {
                         //Hold feed until we are up to flywheel speed
                         intake.transportPower = SubSystemConfigs.TRANSPORT_STOP;
                     }
                 } else {
-                    intake.intakePower = SubSystemConfigs.INTAKE_STOP;
+                    intake.intakePower = SubSystemConfigs.INTAKE_RUN;
                     intake.transportPower = SubSystemConfigs.TRANSPORT_STOP;
                 }
                 if(!driveStation.isTargetLocked) {
@@ -337,7 +337,7 @@ public class Robot {
         return new Action(){
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                launcher.autonSet(0.56, 1020.0);
+                launcher.autonSet(0.56, 980.0);
                 return false;
             }
         };
@@ -346,7 +346,7 @@ public class Robot {
         return new Action(){
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                launcher.autonSet(0.595, 760.0);
+                launcher.autonSet(0.595, 700.0);
                 return false;
             }
         };
