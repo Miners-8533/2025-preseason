@@ -27,7 +27,7 @@ public class AutonBlueFarLoadingZone extends LinearOpMode {
         Pose2d initialPose          = mirrorPose(new Pose2d(64.5,-17.5, Math.toRadians(180 )), isFlipped);
         Pose2d pickLoadingZoneStart = mirrorPose(new Pose2d(56.0,-60.0, Math.toRadians(-45 )), isFlipped);
         Pose2d pickLoadingZoneEnd   = mirrorPose(new Pose2d(65.0,-65.0, Math.toRadians(-90 )), isFlipped);
-        Pose2d farScorePose         = mirrorPose(new Pose2d(57.0,-12.0, Math.toRadians(204.5)), isFlipped);
+        Pose2d farScorePose         = mirrorPose(new Pose2d(57.0,-12.0, Math.toRadians(202.5)), isFlipped);
         Pose2d pickBaseGroup        = mirrorPose(new Pose2d(35.0,-26.0, Math.toRadians(-90 )), isFlipped);
         Pose2d pickBaseGroupEnd     = mirrorPose(new Pose2d(38.0,-48.0, Math.toRadians(-90 )), isFlipped);
         Pose2d pickGateGroupStart   = mirrorPose(new Pose2d(12.0,-25.0, Math.toRadians(-90 )), isFlipped);
@@ -89,6 +89,7 @@ public class AutonBlueFarLoadingZone extends LinearOpMode {
                                 robot.readyLaunch())),
                 robot.launchLong(),
                 robot.runIntake(),
+                //new SleepAction(0.5),
                 blindPick.build(),
                 new ParallelAction(
                         loadZoneToScore.build(),

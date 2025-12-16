@@ -27,7 +27,7 @@ public class AutonRedFar extends LinearOpMode {
         Pose2d initialPose          = mirrorPose(new Pose2d(64.5,-17.5, Math.toRadians(180 )), isFlipped);
         Pose2d pickLoadingZoneStart = mirrorPose(new Pose2d(40.0,-65.0, Math.toRadians(0   )), isFlipped);
         Pose2d pickLoadingZoneEnd   = mirrorPose(new Pose2d(60.0,-65.0, Math.toRadians(0   )), isFlipped);
-        Pose2d farScorePose         = mirrorPose(new Pose2d(57.0,-12.0, Math.toRadians(203 )), isFlipped);
+        Pose2d farScorePose         = mirrorPose(new Pose2d(57.0,-12.0, Math.toRadians(202.5 )), isFlipped);
         Pose2d pickCloseGroup       = mirrorPose(new Pose2d(35.0,-26.0, Math.toRadians(-90 )), isFlipped);
         Pose2d pickCloseGroupSweep  = mirrorPose(new Pose2d(35.0,-58.0, Math.toRadians(-90 )), isFlipped);
         Pose2d park                 = mirrorPose(new Pose2d(36.0,-12.0, Math.toRadians(-135)), isFlipped);

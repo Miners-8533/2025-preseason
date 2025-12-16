@@ -108,7 +108,7 @@ public class Launcher {
         if(isFirstLaunch) {
             threshold *= 1.0;
         } else {
-            threshold *= 0.88;
+            threshold *= 0.90;
         }
         boolean isThresholdMet = velocity > threshold;
         if(isThresholdMet && isFirstLaunch) {
